@@ -1,1317 +1,729 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ilo</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=IM+Fell+English:ital@0;1&family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Dancing+Script:wght@400;700&display=swap"
-    rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,
-<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'>
-  <rect width='64' height='64' fill='%23f7e9e2'/>
-  <text x='32' y='38' font-size='20' text-anchor='middle' fill='%23c2185b' font-family='Georgia, serif'>☕ ♥ 🖤</text>
-</svg>">
-</head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ilo, Happy Birthday</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=Archivo:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://code.iconify.design/3/3.1.1/iconify.min.js"></script>
+<style>
+  :root{
+    --ink:#0b0b0a;
+    --paper:#f5f3ee;
+    --bone:#ece9e1;
+    --fog:#a8a49a;
+    --ash:#68655d;
+    --mute:#c9c6bd;
+    --hair: rgba(236,233,225,0.14);
+    --hair-strong: rgba(236,233,225,0.26);
+    --blush:#e8a2ab;
+    --blush-dim: rgba(232,162,171,0.5);
+    --blush-glow: rgba(232,162,171,0.22);
+    --serif: 'Fraunces', serif;
+    --sans: 'Archivo', sans-serif;
+  }
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ background:var(--ink); scroll-behavior:auto; }
+  body{
+    background:var(--ink); color:var(--bone);
+    font-family:var(--sans); font-weight:400;
+    overflow-x:hidden; -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background:var(--bone); color:var(--ink); }
+  a{ color:inherit; text-decoration:none; }
+  img{ display:block; max-width:100%; }
+  .dot-accent{ color:var(--blush); }
 
+  .veil{
+    position:fixed; inset:0; background:var(--ink); z-index:999;
+    display:flex; align-items:center; justify-content:center;
+    transition:opacity 1s ease;
+  }
+  .veil span{ font-family:var(--serif); font-style:italic; font-weight:300; font-size:14px; letter-spacing:0.06em; color:var(--fog); }
+  .veil.hide{ opacity:0; pointer-events:none; }
+
+  .wrap{ max-width:1180px; margin:0 auto; padding:0 32px; }
+
+  .nav{
+    position:fixed; top:0; left:0; right:0; z-index:60;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:26px 40px; font-size:12.5px; letter-spacing:0.04em; color:var(--fog);
+    mix-blend-mode:difference;
+  }
+  .nav .mark{ font-family:var(--serif); font-style:italic; font-size:15px; color:var(--bone); }
+
+  .dotnav{
+    position:fixed; right:26px; top:50%; transform:translateY(-50%); z-index:55;
+    display:flex; flex-direction:column; gap:14px;
+  }
+  .dotnav .dot{
+    width:6px; height:6px; border-radius:50%; background:var(--hair-strong);
+    cursor:pointer; transition:background .3s, transform .3s;
+  }
+  .dotnav .dot.active{ background:var(--bone); transform:scale(1.5); }
+  @media (max-width:900px){ .dotnav{ display:none; } }
+
+  /* HERO */
+  .hero{
+    min-height:100svh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:150px 24px 110px; position:relative;
+  }
+  .hero .eyebrow{ font-size:13px; letter-spacing:0.03em; color:var(--ash); margin-bottom:28px; }
+  .hero .eyebrow .ov{ display:inline-block; overflow:hidden; }
+  .hero .eyebrow .ov span{ display:inline-block; }
+  .hero h1{
+    font-family:var(--serif); font-weight:400; font-size:clamp(48px,9vw,120px);
+    line-height:0.98; letter-spacing:-0.01em; max-width:1000px;
+  }
+  .hero h1 .line{ overflow:hidden; display:block; }
+  .hero h1 .line span{ display:inline-block; }
+  .hero h1 em{ font-style:italic; font-weight:300; color:var(--fog); }
+  .hero .sub{ margin-top:32px; font-size:16px; line-height:1.7; color:var(--mute); max-width:460px; opacity:0; }
+  .hero .sig{ margin-top:46px; font-family:var(--serif); font-style:italic; font-size:16px; color:var(--fog); opacity:0; }
+  .hero .sig small{ display:block; font-family:var(--sans); font-style:normal; font-size:11px; letter-spacing:0.08em; color:#4d4b45; margin-top:8px; }
+
+  section{ position:relative; }
+  .band{ padding:150px 0; border-top:1px solid var(--hair); }
+  .band-tight{ padding:110px 0; }
+
+  .kicker{ font-size:12.5px; letter-spacing:0.03em; color:var(--ash); margin-bottom:26px; }
+  .prose{ max-width:620px; }
+
+  h2{
+    font-family:var(--serif); font-weight:400; font-size:clamp(32px,4.6vw,56px);
+    line-height:1.12; letter-spacing:-0.005em; margin-bottom:34px; max-width:760px;
+  }
+  h2 em{ font-style:italic; color:var(--blush); font-weight:300; }
+
+  p.lede{ font-size:clamp(17px,1.6vw,20px); line-height:1.75; color:var(--bone); max-width:560px; }
+  p.lede + p.lede{ margin-top:22px; }
+  p.body{ font-size:16px; line-height:1.85; color:var(--mute); max-width:520px; }
+  p.body + p.body{ margin-top:20px; }
+
+  .split{ display:grid; grid-template-columns: 0.85fr 1.15fr; gap:80px; align-items:start; }
+
+  .dropcap p:first-child::first-letter{
+    font-family:var(--serif); font-size:64px; font-weight:400; float:left;
+    line-height:0.8; padding:6px 10px 0 0; color:var(--bone);
+  }
+
+  .pull{
+    margin-top:40px; padding-left:22px; border-left:1px solid var(--blush-dim);
+    font-family:var(--serif); font-style:italic; font-weight:300; font-size:19px;
+    color:var(--fog); max-width:440px; line-height:1.55;
+  }
+
+  /* DISTANCE */
+  .distance-wrap{ padding:60px 0 20px; }
+  .distance-svg{ width:100%; height:auto; overflow:visible; }
+  .distance-svg .pt{ fill:var(--bone); }
+  .distance-svg .pt-ring{ fill:none; stroke:var(--hair-strong); stroke-width:1; }
+  .distance-svg .path{ fill:none; stroke:var(--fog); stroke-width:1; stroke-dasharray:4 6; stroke-linecap:round; }
+  .distance-svg text{ font-family:var(--sans); font-size:11px; letter-spacing:0.05em; fill:var(--ash); }
+  .distance-labels{ display:flex; justify-content:space-between; margin-top:18px; font-size:12.5px; letter-spacing:0.03em; color:var(--ash); }
+  .measure{
+    text-align:center; margin:64px auto 0; font-family:var(--serif); font-weight:300; font-style:italic;
+    font-size:clamp(20px,2.6vw,30px); color:var(--fog); max-width:640px; line-height:1.5;
+  }
+
+  /* LOVE NOTES */
+  .letters{ margin-top:56px; display:flex; flex-direction:column; gap:2px; }
+  .letter-card{
+    padding:46px 0; border-top:1px solid var(--hair);
+    clip-path: inset(0 0 100% 0); will-change: clip-path;
+  }
+  .letter-card:last-child{ border-bottom:1px solid var(--hair); }
+  .letter-date{ display:block; font-size:11.5px; letter-spacing:0.05em; color:var(--ash); margin-bottom:22px; }
+  .letter-sal{ font-family:var(--serif); font-style:italic; font-size:22px; color:var(--bone); margin-bottom:18px; }
+  .letter-body{ font-size:16px; line-height:1.85; color:var(--mute); max-width:600px; }
+  .letter-sig{ margin-top:24px; font-family:var(--serif); font-style:italic; font-size:14px; color:var(--fog); }
+
+  /* MEMORIES — the peak: photographs developing under the scroll */
+  .memories-band{ padding:190px 0 200px; }
+  .memgrid{
+    margin-top:64px; display:grid; grid-template-columns: repeat(4, 1fr); gap:3px;
+  }
+  .memcard{
+    position:relative; aspect-ratio: 3/4; overflow:hidden; cursor:zoom-in;
+    background:#161614;
+    --dev: 0; /* 0 = undeveloped, 1 = fully developed — driven by scroll */
+  }
+  .memcard:nth-child(3n+2){ aspect-ratio: 4/5; }
+  .memcard:nth-child(2n){ transform: translateY(34px); }
+  @media (max-width:900px){ .memcard:nth-child(2n){ transform:none; } }
+  .memcard img{
+    width:100%; height:100%; object-fit:cover;
+    filter: grayscale(calc(1 - var(--dev) * 0.72)) contrast(calc(0.72 + var(--dev) * 0.33))
+            brightness(calc(1.55 - var(--dev) * 0.55)) blur(calc((1 - var(--dev)) * 3px));
+    transform: scale(calc(1.06 - var(--dev) * 0.015));
+    transition: transform 1.1s cubic-bezier(.16,1,.3,1);
+  }
+  .memcard:hover img{ transform:scale(calc(1.045 - var(--dev) * 0.015)); }
+  .memcard::after{
+    content:''; position:absolute; inset:0; pointer-events:none;
+    background: radial-gradient(120% 90% at 30% 20%, rgba(245,243,238,0.5), transparent 60%);
+    opacity: calc((1 - var(--dev)) * 0.9);
+    mix-blend-mode: screen;
+  }
+  .memcap{
+    position:absolute; left:0; right:0; bottom:0; padding:16px 16px 14px;
+    background:linear-gradient(to top, rgba(0,0,0,0.75), transparent);
+    font-size:12px; line-height:1.4; color:var(--bone);
+    opacity:0; transform:translateY(6px); transition:opacity .35s, transform .35s;
+  }
+  .memcard:hover .memcap, .memcard.developed .memcap{ opacity:1; transform:translateY(0); }
+  @media (max-width:900px){ .memgrid{ grid-template-columns: repeat(2,1fr); } }
+
+  .lightbox{
+    position:fixed; inset:0; background:rgba(6,6,5,0.94); z-index:200;
+    display:flex; align-items:center; justify-content:center; padding:5vh 5vw;
+    opacity:0; pointer-events:none; transition:opacity .35s;
+  }
+  .lightbox.show{ opacity:1; pointer-events:auto; }
+  .lightbox img{ max-width:100%; max-height:90vh; object-fit:contain; }
+  .lightbox .lb-close{
+    position:absolute; top:28px; right:32px; background:none; border:none; color:var(--bone);
+    font-size:26px; cursor:pointer; line-height:1;
+  }
+
+  /* QUOTES */
+  .quotelist{ margin-top:56px; display:flex; flex-direction:column; }
+  .qrow{ padding:34px 0; border-top:1px solid var(--hair); display:grid; grid-template-columns:1fr 260px; gap:40px; align-items:baseline; }
+  .qrow:last-child{ border-bottom:1px solid var(--hair); }
+  .qtext{ font-family:var(--serif); font-weight:400; font-style:italic; font-size:clamp(19px,2vw,24px); line-height:1.45; color:var(--bone); }
+  .qauthor{ font-size:12px; letter-spacing:0.03em; color:var(--ash); text-align:right; }
+  @media (max-width:780px){ .qrow{ grid-template-columns:1fr; gap:12px; } .qauthor{ text-align:left; } }
+
+  /* MIXTAPE */
+  .mix-wrap{ margin-top:60px; display:grid; grid-template-columns: 320px 1fr; gap:70px; align-items:start; }
+  @media (max-width:900px){ .mix-wrap{ grid-template-columns:1fr; gap:50px; } }
+
+  .player{ border:1px solid var(--hair); padding:34px; }
+  .vinyl-stage{ display:flex; align-items:center; justify-content:center; padding:20px 0 34px; }
+  .vinyl{
+    width:180px; height:180px; border-radius:50%;
+    background: repeating-radial-gradient(circle at center, #1c1c19 0px, #1c1c19 2px, #131311 3px, #131311 4px);
+    border:1px solid var(--hair-strong);
+    display:flex; align-items:center; justify-content:center;
+    animation: spin 6s linear infinite; animation-play-state:paused;
+    transition: border-color .5s ease;
+  }
+  .vinyl.playing{ border-color: var(--blush-dim); animation-play-state:running; }
+  .vinyl-center{
+    width:16px; height:16px; border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, var(--blush) 0%, #c9808c 65%, #9a5964 100%);
+    box-shadow: 1px 2px 4px rgba(0,0,0,0.55);
+    transition: transform .4s ease;
+  }
+  .vinyl.playing .vinyl-center{ transform:scale(1.08); }
+  @keyframes spin{ from{transform:rotate(0)} to{transform:rotate(360deg)} }
+
+  .player-controls{ display:flex; align-items:center; justify-content:center; gap:22px; margin-bottom:22px; }
+  .ctrl-btn{ background:none; border:none; color:var(--fog); cursor:pointer; font-size:20px; display:flex; transition:color .25s; }
+  .ctrl-btn:hover{ color:var(--blush); }
+  .main-btn{
+    width:46px; height:46px; border-radius:50%; border:1px solid var(--hair-strong);
+    background:none; color:var(--bone); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:18px;
+    transition: border-color .25s, color .25s;
+  }
+  .main-btn:hover{ border-color:var(--blush); color:var(--blush); }
+  .main-btn .pause-ic{ display:none; }
+  .main-btn.is-playing .play-ic{ display:none; }
+  .main-btn.is-playing .pause-ic{ display:flex; }
+
+  .timeline-wrap{ display:flex; align-items:center; gap:10px; font-size:11px; color:var(--ash); }
+  #timeline{
+    flex:1; -webkit-appearance:none; height:1px; outline:none; --fill:0%;
+    background: linear-gradient(to right, var(--blush) var(--fill), var(--hair-strong) var(--fill));
+  }
+  #timeline::-webkit-slider-thumb{ -webkit-appearance:none; width:8px; height:8px; border-radius:50%; background:var(--blush); cursor:pointer; }
+  #timeline::-moz-range-thumb{ width:8px; height:8px; border-radius:50%; background:var(--blush); border:none; cursor:pointer; }
+
+  .tracklist{ display:flex; flex-direction:column; max-height:520px; overflow-y:auto; }
+  .track{
+    display:grid; grid-template-columns:34px 1fr; gap:16px; padding:14px 4px;
+    border-top:1px solid var(--hair); cursor:pointer; align-items:center;
+  }
+  .tracklist .track:last-child{ border-bottom:1px solid var(--hair); }
+  .track span{ font-size:12px; color:var(--ash); }
+  .track strong{ display:block; font-weight:500; font-size:14.5px; color:var(--mute); }
+  .track small{ display:block; font-size:11.5px; color:var(--ash); margin-top:2px; }
+  .track.active-track{ border-left:2px solid var(--blush); padding-left:14px; margin-left:-12px; }
+  .track.active-track strong{ color:var(--bone); }
+  .track.active-track span{ color:var(--blush); }
+  .track:hover strong{ color:var(--bone); }
+  .tracklist::-webkit-scrollbar{ width:3px; }
+  .tracklist::-webkit-scrollbar-thumb{ background:var(--hair-strong); }
+
+  /* ENDING */
+  .closing{
+    min-height:88svh; display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:120px 24px;
+  }
+  .closing .kicker{ text-align:center; }
+  .closing p.lede{ margin:0 auto; text-align:center; max-width:600px; }
+  .closing .mark3{ margin-top:44px; letter-spacing:0.3em; color:var(--ash); font-size:12px; }
+  .closing .sig{ margin-top:20px; font-family:var(--serif); font-style:italic; font-size:20px; color:var(--fog); }
+
+  /* INVITE */
+  .invite{ text-align:center; }
+  .invite h2{ margin-left:auto; margin-right:auto; max-width:760px; }
+  .invite p.lede{ margin:0 auto 14px; text-align:center; }
+  .invite .contact{ margin-top:30px; font-size:15px; color:var(--mute); line-height:1.8; }
+  .invite .btn{
+    display:inline-block; margin-top:34px; padding:16px 40px; border:1px solid var(--hair-strong);
+    font-size:13px; letter-spacing:0.05em; color:var(--bone); transition:border-color .3s, background .3s;
+  }
+  .invite .btn:hover{ border-color:var(--bone); background:rgba(236,233,225,0.05); }
+
+  footer{
+    border-top:1px solid var(--hair); padding:40px 0 50px;
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:11.5px; letter-spacing:0.03em; color:var(--ash);
+  }
+
+  @media (max-width:780px){
+    .wrap{ padding:0 22px; } .nav{ padding:22px 22px; }
+    .split{ grid-template-columns:1fr; gap:40px; }
+    .band{ padding:100px 0; }
+    .mix-wrap{ margin-top:44px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; transition-duration:0.001ms !important; }
+  }
+</style>
+</head>
 <body>
 
-  <!-- Particles -->
-  <div id="particles"></div>
+<div class="veil"><span>iloni</span></div>
 
-  <!-- ── ENVELOPE OVERLAY ── -->
-  <div id="envelopeOverlay" class="envelope-overlay">
+<nav class="nav">
+  <span class="mark">Ilo</span>
+  <span>from a distance</span>
+</nav>
 
-    <div class="envelope-wrapper">
+<nav class="dotnav" aria-label="Section navigation">
+  <div class="dot active" data-target="cover"></div>
+  <div class="dot" data-target="about"></div>
+  <div class="dot" data-target="distance"></div>
+  <div class="dot" data-target="lovenotes"></div>
+  <div class="dot" data-target="memories"></div>
+  <div class="dot" data-target="quotes"></div>
+  <div class="dot" data-target="mixtape"></div>
+  <div class="dot" data-target="ending"></div>
+  <div class="dot" data-target="invite"></div>
+</nav>
 
-      <!-- Envelope -->
-      <div class="envelope" id="envelope">
+<!-- HERO -->
+<section id="cover" class="hero">
+  <div class="eyebrow"><span class="ov"><span>for iloni, from miles away</span></span></div>
+  <h1>
+    <span class="line"><span>Happy birthday,</span></span>
+    <span class="line"><span><em>Ilo.</em></span></span>
+  </h1>
+  <p class="sub">Another day of you existing somewhere far away, and me being grateful for it anyway.</p>
+  <div class="sig"><span class="dot-accent">·</span> the Mike who's counting down to meeting you<small>2026</small></div>
+</section>
 
-        <div class="envelope-flap"></div>
-
-        <div class="letter">
-          <h2>Happy Birthday, Ilo 🖤</h2>
-          <p>
-            Another day of you existing somewhere far away, and me being grateful for it anyway.<br>
-            I made you this instead of a gift I could hand you, since the distance won't let me do that yet.<br>
-            You're a whole vibe — soft eyes, sharp edges, a black dress and a coffee order that somehow says
-            everything about you.<br>
-            I know you don't say "I love you" easily, and that's okay — I notice you loud even when you're being
-            quiet about it.<br>
-            One day there'll be no miles between us, just you, me, and a coffee that's finally shared instead of
-            described over text.<br>
-            Until then — happy birthday, Ilo. 🤍
-          </p>
-
-          <button id="closeLetter">Close ✧</button>
-        </div>
-
+<!-- CHAPTER I — ABOUT HER -->
+<section id="about" class="band" data-reveal>
+  <div class="wrap">
+    <div class="split">
+      <div><div class="kicker">chapter one · about her</div></div>
+      <div class="prose dropcap">
+        <p class="lede">Ilo, or Iloni when I want to sound extra serious, is a whole contradiction wrapped in a black dress and a coffee order she's very particular about. She looks unbothered, a little dangerous even, the kind of girl people notice without knowing why. And then you actually talk to her and realize she's soft in all the places she'd never admit to.</p>
+        <p class="body">She doesn't say "I love you" easily. She shows it instead: in the way she remembers small things, in the way she goes quiet when she actually cares, in the way her walls take forever to come down and mean everything once they do.</p>
+        <p class="body">She loves her coffee, her lip gloss collection, her clothes, and the quiet little rituals that are hers alone.</p>
+        <p class="body">She lives far from me, farther than I'd like, and we haven't even met in person yet. But somehow, from this distance, she's still managed to become one of my favorite people.</p>
+        <p class="pull">Baddie exterior, soft heart, terrible at saying it out loud, and somehow that's exactly who I fell for.</p>
       </div>
-
-      <button id="openLetter">Open Letter</button>
-
     </div>
   </div>
+</section>
 
-  <!-- Music Button -->
-  <button id="musicBtn" title="Toggle ambient music" aria-label="Toggle music">♪</button>
+<!-- CHAPTER II — THE DISTANCE -->
+<section id="distance" class="band" data-reveal>
+  <div class="wrap">
+    <div class="kicker">chapter two · the distance</div>
+    <h2>Two points on a map, <em>learning patience.</em></h2>
+    <p class="lede">Different clocks. Different weather. The same phone, held at strange hours because it's the only hour we share.</p>
+    <p class="body" style="margin-top:22px;">I wish I could hand you a coffee in person instead of hearing about your order over text. Soon, though. I'm holding onto that.</p>
 
-  <!-- Nav dots -->
-  <nav id="nav-dots" aria-label="Section navigation">
-    <div class="nav-dot active" data-target="cover" title="Cover"></div>
-    <div class="nav-dot" data-target="about" title="About Her"></div>
-    <div class="nav-dot" data-target="lovenotes" title="Love Notes"></div>
-    <div class="nav-dot" data-target="memories" title="Memories"></div>
-    <div class="nav-dot" data-target="quotes" title="Little Truths"></div>
-    <div class="nav-dot" data-target="mixtape" title="Mixtape"></div>
-    <div class="nav-dot" data-target="ending" title="Ending Chapter"></div>
-    <div class="nav-dot" data-target="invite" title="Invitation"></div>
-
-  </nav>
-
-  <!-- ══ COVER ══ -->
-  <section id="cover" class="page">
-    <div class="candle-glow left"></div>
-    <div class="candle-glow right"></div>
-
-    <div class="cover-ornament">☕ ♥ 🖤</div>
-    <div style="height:1.5rem"></div>
-    <h1 class="cover-title">Ilo</h1>
-    <p class="cover-subtitle">Happy Birthday, From Miles Away</p>
-    <p class="cover-author">— the Mike who's counting down to meeting you —</p>
-    <p class="cover-year">∼ 2026 ∼</p>
-
-    <div class="scroll-hint">
-      <span>❧</span>
-      Turn the page
-      <span>↓</span>
-    </div>
-  </section>
-
-  <!-- ══ ABOUT HER ══ -->
-  <div class="page-divider"></div>
-  <section id="about" class="page parchment-page ruled-bg">
-    <div class="chapter-header reveal">
-      <p class="chapter-number">Chapter I</p>
-      <h2 class="chapter-title">About Her</h2>
-      <div class="chapter-rule"><span class="chapter-rule-diamond">◆</span></div>
-      <p class="chapter-ornament">❧</p>
+    <div class="distance-wrap">
+      <svg class="distance-svg" viewBox="0 0 1000 220" preserveAspectRatio="xMidYMid meet" id="distanceSvg">
+        <circle class="pt-ring" cx="120" cy="150" r="16"></circle>
+        <circle class="pt" cx="120" cy="150" r="4"></circle>
+        <text x="120" y="190" text-anchor="middle">you</text>
+        <circle class="pt-ring" cx="880" cy="90" r="16"></circle>
+        <circle class="pt" cx="880" cy="90" r="4"></circle>
+        <text x="880" y="60" text-anchor="middle">me</text>
+        <path class="path" id="distancePath" d="M136,150 C 400,40 600,220 864,90"></path>
+      </svg>
+      <div class="distance-labels"><span>here, now</span><span>there, later</span></div>
     </div>
 
-    <div class="about-content">
-      <div class="about-text drop-cap reveal">
-        <p>Ilo — or Iloni, when I want to sound extra serious — is a whole contradiction wrapped in a black dress
-          and a coffee order she's very particular about. She looks unbothered, a little dangerous even, the kind
-          of girl people notice without knowing why. And then you actually talk to her and realize she's soft in
-          all the places she'd never admit to.</p>
+    <p class="measure">"Not close. Not yet. But closer than the day before."</p>
+  </div>
+</section>
 
-        <p>She doesn't say "I love you" easily. She shows it instead — in the way she remembers small things, in
-          the way she goes quiet when she actually cares, in the way her walls take forever to come down and mean
-          everything once they do. I've learned to read her in the spaces between her words.</p>
+<!-- CHAPTER III — LOVE NOTES -->
+<section id="lovenotes" class="band" data-reveal>
+  <div class="wrap">
+    <div class="kicker">chapter three · love notes</div>
+    <h2>Two letters, <em>never sent by post.</em></h2>
 
-        <p>She loves her coffee, her lip gloss collection, her clothes, and the quiet little rituals that are hers
-          alone — a slow exhale by the window, a good playlist, a black dress that she somehow makes look like
-          armor and softness at once.</p>
-
-        <p>She lives far from me, farther than I'd like, and we haven't even met in person yet. But somehow, from
-          this distance, she's still managed to become one of my favorite people. I'm just waiting for the day the
-          miles finally close.</p>
+    <div class="letters">
+      <div class="letter-card">
+        <span class="letter-date">no particular day, just a feeling</span>
+        <div class="letter-sal">Dearest Ilo,</div>
+        <p class="letter-body">You're the kind of girl who walks in looking unbothered, in that black dress that somehow reads as both "don't try me" and "come closer" at the same time, and it works on me every single time, even through a screen, even from this far away.<br><br>I know saying how you feel doesn't come easy for you. It doesn't have to. I've learned to notice you in the quiet ways: the longer replies, the little things you remember, the version of you that only shows up when you actually trust someone.</p>
+        <div class="letter-sig"><span class="dot-accent">·</span> Mike, who notices you</div>
       </div>
-
-      <div class="side-note reveal">
-        "Baddie exterior, soft heart, terrible at saying it out loud — and somehow that's exactly who I fell for."
+      <div class="letter-card">
+        <span class="letter-date">a rainy friday, thinking of you</span>
+        <div class="letter-sal">To the girl with the soft heart,</div>
+        <p class="letter-body">Everyone sees the confidence: the fits, the gloss, the "I don't need anyone" energy. I see that too. But I also see the version of you that gets shy when someone's actually kind to you, and honestly, that's the version I fell for.<br><br>I wish I could hand you a coffee in person instead of just hearing about your order over text. Soon, though. I'm holding onto that.</p>
+        <div class="letter-sig"><span class="dot-accent">·</span> Mike, who notices you</div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ══ LOVE NOTES ══ -->
-  <div class="page-divider up"></div>
-  <div class="page-divider"></div>
-  <section id="lovenotes" class="page parchment-page">
-    <div class="chapter-header reveal">
-      <p class="chapter-number">Chapter II</p>
-      <h2 class="chapter-title">Love Notes</h2>
-      <div class="chapter-rule"><span class="chapter-rule-diamond">◆</span></div>
-      <p class="chapter-ornament">❧</p>
+<!-- CHAPTER IV — MEMORIES -->
+<section id="memories" class="band memories-band" data-reveal>
+  <div class="wrap">
+    <div class="kicker">chapter four · memories</div>
+    <h2>A few frames I <em>keep coming back to.</em></h2>
+
+    <div class="memgrid">
+      <div class="memcard"><img src="img1.jpg" alt="Memory" loading="lazy"><div class="memcap">The first photo you ever sent me</div></div>
+      <div class="memcard"><img src="img4.jpg" alt="Memory" loading="lazy"><div class="memcap">That black dress lives rent-free in my head</div></div>
+      <div class="memcard"><img src="img3.jpg" alt="Memory" loading="lazy"><div class="memcap">Unbothered, effortless, completely you</div></div>
+      <div class="memcard"><img src="img2.jpg" alt="Memory" loading="lazy"><div class="memcap">The rare soft smile you don't show everyone</div></div>
+      <div class="memcard"><img src="img5.jpg" alt="Memory" loading="lazy"><div class="memcap">You, mid-laugh, gloss probably reapplied twice</div></div>
+      <div class="memcard"><img src="img6.PNG" alt="Memory" loading="lazy"><div class="memcap">This one made me miss you from miles away</div></div>
+      <div class="memcard"><img src="img7.jpg" alt="Memory" loading="lazy"><div class="memcap">You have no idea how often I look at this one</div></div>
+      <div class="memcard"><img src="img8.jpg" alt="Memory" loading="lazy"><div class="memcap">Reason number a thousand I can't wait to meet you</div></div>
     </div>
+  </div>
+</section>
 
-    <div class="notes-container">
+<!-- CHAPTER V — LITTLE TRUTHS -->
+<section id="quotes" class="band" data-reveal>
+  <div class="wrap">
+    <div class="kicker">chapter five · little truths about you</div>
+    <h2>Things I know, <em>even from here.</em></h2>
 
-      <div class="letter-card reveal">
-        <span class="letter-date">No particular day, just a feeling</span>
-        <div class="letter-salutation">Dearest Ilo,</div>
-        <p class="letter-body">
-          You're the kind of girl who walks in looking unbothered, in that black dress that somehow reads as both
-          "don't try me" and "come closer" at the same time — and it works on me every single time, even through a
-          screen, even from this far away.
-          <br><br>
-          I know saying how you feel doesn't come easy for you. It doesn't have to. I've learned to notice you in
-          the quiet ways — the longer replies, the little things you remember, the version of you that only shows up
-          when you actually trust someone.
-        </p>
-        <div class="letter-signature">— the Mike who knows you and admires you ♡</div>
-        <div class="wax-seal">♡</div>
-      </div>
-
-      <div class="letter-card reveal">
-        <span class="letter-date">A rainy Friday, thinking of you</span>
-        <div class="letter-salutation">To the baddie with the soft heart,</div>
-        <p class="letter-body">
-          Everyone sees the confidence — the fits, the gloss, the "I don't need anyone" energy. I see that too. But
-          I also see the version of you that gets shy when someone's actually kind to you, and honestly, that's the
-          version I fell for.
-          <br><br>
-          I wish I could hand you a coffee in person instead of just hearing about your order over text. Soon,
-          though. I'm holding onto that.
-        </p>
-        <div class="letter-signature">— the Mike who knows you and admires you ♡</div>
-        <div class="wax-seal">✦</div>
-      </div>
-
-
-
+    <div class="quotelist">
+      <div class="qrow"><p class="qtext">"She looks like she doesn't need anyone. She is, secretly, one of the softest people I know."</p><p class="qauthor">on the girl behind the black dress</p></div>
+      <div class="qrow"><p class="qtext">"She doesn't say 'I love you.' She remembers what you told her three weeks ago and brings it up like it mattered. It did."</p><p class="qauthor">on the way she loves quietly</p></div>
+      <div class="qrow"><p class="qtext">"A good coffee, the right gloss, an outfit that feels like armor: she knows exactly who she is, even when she won't say what she feels."</p><p class="qauthor">on her little rituals</p></div>
+      <div class="qrow"><p class="qtext">"Distance is just a rude, temporary inconvenience. I already know I'd choose her in a room full of people I could actually touch."</p><p class="qauthor">on missing her from here</p></div>
+      <div class="qrow"><p class="qtext">"To love her is to be patient with her walls, and grateful for every inch she lets down."</p><p class="qauthor">the whole point of this page</p></div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ══ MEMORIES ══ -->
-  <div class="page-divider up"></div>
-  <div class="page-divider"></div>
-  <section id="memories" class="page parchment-page">
-    <div class="chapter-header reveal">
-      <p class="chapter-number">Chapter III</p>
-      <h2 class="chapter-title">Memories </h2>
-      <div class="chapter-rule"><span class="chapter-rule-diamond">◆</span></div>
-      <p class="chapter-ornament">❧</p>
-    </div>
+<!-- CHAPTER VI — MIXTAPE -->
+<section id="mixtape" class="band" data-reveal>
+  <div class="wrap">
+    <div class="kicker">chapter six · a mixtape for you</div>
+    <h2>Songs that sound like <em>missing you.</em></h2>
+    <p class="lede">Fourteen tracks, for whenever the distance needs a soundtrack.</p>
 
-    <div class="memories-grid reveal-stagger">
-
-      <div class="memory-card">
-        <div class="memory-tape"></div>
-        <div class="memory-photo-placeholder">
-          <img src="img1.jpg" alt="Memory" class="memory-photo">
+    <div class="mix-wrap">
+      <div class="player">
+        <div class="vinyl-stage">
+          <div class="vinyl paused" id="vinyl"><div class="vinyl-center"></div></div>
         </div>
-        <p class="memory-caption">The first photo you ever sent me 💝</p>
-      </div>
-
-      <div class="memory-card">
-        <div class="memory-tape"></div>
-
-        <div class="memory-photo-placeholder">
-          <img src="img4.jpg" alt="Memory" class="memory-photo">
-        </div>
-        <p class="memory-caption">That black dress lives rent-free in my head 🖤</p>
-      </div>
-
-      <div class="memory-card">
-        <div class="memory-tape"></div>
-        <div class="memory-photo-placeholder">
-          <img src="img3.jpg" alt="Memory" class="memory-photo">
-        </div>
-        <p class="memory-caption">Unbothered, effortless, completely you 💤</p>
-      </div>
-
-      <div class="memory-card">
-        <div class="memory-tape"></div>
-        <div class="memory-photo-placeholder">
-          <img src="img2.jpg" alt="Memory" class="memory-photo">
-        </div>
-        <p class="memory-caption">The rare soft smile you don't show everyone 🌻</p>
-      </div>
-
-      <div class="memory-card">
-        <div class="memory-tape"></div>
-        <div class="memory-photo-placeholder">
-          <img src="img5.jpg" alt="Memory" class="memory-photo">
-        </div>
-        <p class="memory-caption">You, mid-laugh, gloss probably reapplied twice 🐈</p>
-      </div>
-
-      <div class="memory-card">
-        <div class="memory-tape"></div>
-
-        <div class="memory-photo-placeholder">
-          <img src="img6.PNG" alt="Memory" class="memory-photo">
-        </div>
-
-        <p class="memory-caption">
-          This one made me miss you from miles away 🤍
-        </p>
-      </div>
-
-      <div class="memory-card">
-        <div class="memory-tape"></div>
-        <div class="memory-photo-placeholder">
-          <img src="img7.jpg" alt="Memory" class="memory-photo">
-        </div>
-        <p class="memory-caption">You have no idea how often I look at this one</p>
-      </div>
-
-      <div class="memory-card">
-        <div class="memory-tape"></div>
-        <div class="memory-photo-placeholder">
-          <img src="img8.jpg" alt="Memory" class="memory-photo">
-        </div>
-        <p class="memory-caption">Reason number a thousand I can't wait to meet you 🖤</p>
-      </div>
-
-
-
-
-    </div>
-  </section>
-
-  <!-- ══ QUOTES ══ -->
-  <div class="page-divider up"></div>
-  <section id="quotes" class="page">
-    <div class="quotes-inner">
-
-      <div class="chapter-header reveal" style="color:var(--parchment)">
-        <p class="chapter-number" style="color:var(--gold);opacity:0.7">Chapter IV</p>
-        <h2 class="chapter-title" style="color:var(--parchment)">Little Truths About You</h2>
-        <div class="chapter-rule" style="max-width:300px"><span class="chapter-rule-diamond"
-            style="color:var(--gold)">◆</span></div>
-      </div>
-
-      <div class="quote-block reveal">
-        <span class="quote-mark">"</span>
-        <p class="quote-text">She looks like she doesn't need anyone. She is, secretly, one of the softest people I
-          know.</p>
-        <p class="quote-author">— on the girl behind the black dress</p>
-      </div>
-
-      <div class="quote-block reveal">
-        <span class="quote-mark">"</span>
-        <p class="quote-text">She doesn't say "I love you" — she remembers what you told her three weeks ago and
-          brings it up like it mattered. It did.</p>
-        <p class="quote-author">— on the way she loves quietly</p>
-      </div>
-
-      <div class="quote-block reveal">
-        <span class="quote-mark">"</span>
-        <p class="quote-text">A good coffee, the right gloss, an outfit that feels like armor — she knows exactly
-          who she is, even when she won't say what she feels.</p>
-        <p class="quote-author">— on her little rituals</p>
-      </div>
-
-      <div class="quote-block reveal">
-        <span class="quote-mark">"</span>
-        <p class="quote-text">Distance is just a rude, temporary inconvenience. I already know I'd choose her in a
-          room full of people I could actually touch.</p>
-        <p class="quote-author">— on missing her from here</p>
-      </div>
-
-      <div class="quote-block reveal">
-        <span class="quote-mark">"</span>
-        <p class="quote-text">To love her is to be patient with her walls, and grateful for every inch she lets
-          down.</p>
-        <p class="quote-author">— the whole point of this page</p>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ══ MIXTAPE ══ -->
-  <div class="page-divider up"></div>
-  <div class="page-divider"></div>
-
-  <section id="mixtape" class="page parchment-page">
-    <!-- floating lyrics -->
-    <div class="lyrics-bg">
-
-      <span>"You're amazing just the way you are"</span>
-
-      <span>"I could stay awake just to hear you breathing"</span>
-
-      <span>"You are the treasure that I seek"</span>
-
-      <span>"It's your golden hour"</span>
-
-      <span>"I wanna dive in deeper"</span>
-
-      <span>"Open arms and open hearts"</span>
-
-      <span>"And when you smile, the whole world stops"</span>
-
-      <span>"I could make you happy, make your dreams come true"</span>
-
-      <span>"You're every reason, every hope"</span>
-
-      <span>"Baby you're a firework"</span>
-
-      <span>"You shine brighter than the stars"</span>
-
-      <span>"Can we always be this close forever and ever?"</span>
-
-      <span>"Nothing can compare to where you send me"</span>
-
-      <span>"Treasure, that is what you are"</span>
-
-      <span>"Cause girl you're amazing"</span>
-
-      <span>"I don't wanna miss one smile"</span>
-
-      <span>"You make the darkness disappear"</span>
-
-      <span>"It's the way you lift me up"</span>
-
-      <span>"Your love feels like sunlight"</span>
-
-      <span>"I found my missing piece in you"</span>
-
-    </div>
-
-    <div class="chapter-header reveal">
-      <p class="chapter-number">Chapter V</p>
-      <h2 class="chapter-title">A Mixtape for You</h2>
-
-      <div class="chapter-rule">
-        <span class="chapter-rule-diamond">◆</span>
-      </div>
-
-      <p class="chapter-ornament">♫</p>
-    </div>
-
-    <div class="mixtape-container">
-
-      <!-- PLAYER -->
-      <div class="vinyl-wrapper">
-
-        <div class="player-base">
-
-          <!-- arm -->
-          <div class="tonearm" id="tonearm">
-            <div class="tonearm-head"></div>
-          </div>
-
-          <!-- vinyl -->
-          <div class="vinyl paused" id="vinyl">
-            <div class="vinyl-shine"></div>
-            <div class="vinyl-center"></div>
-          </div>
-
-        </div>
-
-        <!-- controls -->
         <div class="player-controls">
-
-          <button id="prevBtn" class="control-btn">⏮</button>
-
+          <button id="prevBtn" class="ctrl-btn"><span class="iconify" data-icon="solar:skip-previous-bold"></span></button>
           <button id="playPauseBtn" class="main-btn">
-            ▶
+            <span class="iconify play-ic" data-icon="solar:play-bold"></span>
+            <span class="iconify pause-ic" data-icon="solar:pause-bold"></span>
           </button>
-
-          <button id="nextBtn" class="control-btn">⏭</button>
-
+          <button id="nextBtn" class="ctrl-btn"><span class="iconify" data-icon="solar:skip-next-bold"></span></button>
         </div>
-        <!-- timeline -->
         <div class="timeline-wrap">
-
           <span id="currentTime">0:00</span>
-
           <input type="range" id="timeline" min="0" max="100" value="0">
-
           <span id="duration">0:00</span>
-
         </div>
-
       </div>
 
-      <!-- TRACKLIST -->
       <div class="tracklist">
-
-        <div class="track active-track">
-          <span>01.</span>
-          <div>
-            <strong>Mexican Girl</strong>
-            <small>Smokie</small>
-          </div>
-        </div>
-        <div class="track">
-          <span>02.</span>
-          <div>
-            <strong>Dive (Ellie's Version)</strong>
-            <small>Ellie Banke</small>
-          </div>
-        </div>
-
-        <div class="track">
-          <span>03.</span>
-          <div>
-            <strong>Just the Way You Are</strong>
-            <small>Bruno Mars</small>
-          </div>
-        </div>
-
-        <div class="track">
-          <span>04.</span>
-          <div>
-            <strong>Los Angeles</strong>
-            <small>The Midnight</small>
-          </div>
-        </div>
-
-        <div class="track">
-          <span>05.</span>
-          <div>
-            <strong>I Don't Want to Miss a Thing</strong>
-            <small>Aerosmith</small>
-          </div>
-        </div>
-
-        <div class="track">
-          <span>06.</span>
-          <div>
-            <strong>Treasure</strong>
-            <small>Bruno Mars</small>
-          </div>
-        </div>
-
-
-
-        <div class="track">
-          <span>07.</span>
-          <div>
-            <strong>Robbers</strong>
-            <small>The 1975</small>
-          </div>
-        </div>
-
-        <div class="track">
-          <span>08.</span>
-          <div>
-            <strong>Next To You</strong>
-            <small>Chris Brown feat. Justin Bieber</small>
-          </div>
-        </div>
-
-        <div class="track">
-          <span>09.</span>
-          <div>
-            <strong>Miss Atomic Bomb</strong>
-            <small>The Killers</small>
-          </div>
-        </div>
-
-        <div class="track">
-          <span>10.</span>
-          <div>
-            <strong>Versace on the Floor</strong>
-            <small>Bruno Mars</small>
-          </div>
-        </div>
-
-        <div class="track">
-          <span>11.</span>
-          <div>
-            <strong>Uptown Girl</strong>
-            <small>Billy Joel</small>
-          </div>
-        </div>
-
-        <div class="track">
-          <span>12.</span>
-          <div>
-            <strong>Teenage Dirtbag</strong>
-            <small>Wheatus</small>
-          </div>
-        </div>
-
-        <div class="track">
-          <span>13.</span>
-          <div>
-            <strong>Open Arms</strong>
-            <small>Journey</small>
-          </div>
-        </div>
-
-        <div class="track">
-          <span>14.</span>
-          <div>
-            <strong>Pakx - Anyone (Zouk Cover Remix)</strong>
-            <small>rj music.</small>
-          </div>
-        </div>
-
+        <div class="track active-track"><span>01</span><div><strong>Mexican Girl</strong><small>Smokie</small></div></div>
+        <div class="track"><span>02</span><div><strong>Dive (Ellie's Version)</strong><small>Ellie Banke</small></div></div>
+        <div class="track"><span>03</span><div><strong>Just the Way You Are</strong><small>Bruno Mars</small></div></div>
+        <div class="track"><span>04</span><div><strong>Los Angeles</strong><small>The Midnight</small></div></div>
+        <div class="track"><span>05</span><div><strong>I Don't Want to Miss a Thing</strong><small>Aerosmith</small></div></div>
+        <div class="track"><span>06</span><div><strong>Treasure</strong><small>Bruno Mars</small></div></div>
+        <div class="track"><span>07</span><div><strong>Robbers</strong><small>The 1975</small></div></div>
+        <div class="track"><span>08</span><div><strong>Next To You</strong><small>Chris Brown feat. Justin Bieber</small></div></div>
+        <div class="track"><span>09</span><div><strong>Miss Atomic Bomb</strong><small>The Killers</small></div></div>
+        <div class="track"><span>10</span><div><strong>Versace on the Floor</strong><small>Bruno Mars</small></div></div>
+        <div class="track"><span>11</span><div><strong>Uptown Girl</strong><small>Billy Joel</small></div></div>
+        <div class="track"><span>12</span><div><strong>Teenage Dirtbag</strong><small>Wheatus</small></div></div>
+        <div class="track"><span>13</span><div><strong>Open Arms</strong><small>Journey</small></div></div>
+        <div class="track"><span>14</span><div><strong>Anyone (Zouk Cover Remix)</strong><small>Pakx / rj music</small></div></div>
       </div>
-
     </div>
-
     <audio id="mixtapeAudio"></audio>
-
-  </section>
-
-  <!-- ══ ENDING ══ -->
-  <section id="ending" class="page">
-    <div class="candle-glow left" style="opacity:0.5"></div>
-    <div class="candle-glow right" style="opacity:0.5"></div>
-
-    <div class="ending-inner reveal">
-      <p class="dedication-label">∼ The Final Chapter ∼</p>
-
-      <!-- <h2 class="dedication-text">
-        "And in the end, it was always going to be you."
-      </h2> -->
-
-      <div class="chapter-rule" style="max-width:300px; margin: 0 auto 2rem;">
-        <span class="chapter-rule-diamond" style="color:var(--gold)">◆</span>
-      </div>
-
-      <p class="dedication-body">
-        This whole little page is everything I can't always say out loud — that I notice you, the real you, under
-        the black dress and the confidence and the walls you don't let down for just anyone. That I love your
-        softness precisely because you guard it so carefully.
-        <br><br>
-        Happy birthday, Ilo. This one's for you. All of it is for you — and I can't wait for the day the distance
-        finally runs out.
-      </p>
-
-      <span class="ending-heart">♥♥♥</span>
-
-      <div class="ending-signature">∼ The End ∼ </div>
-
-      <!-- <p class="fin-text">∼ The End ∼</p> -->
-    </div>
-
-  </section>
-  <section id="invite" class="page parchment-page">
-    <div class="chapter-header reveal">
-      <p class="chapter-number">A Quiet Invitation</p>
-      <h2 class="chapter-title">Before You Close This Book</h2>
-      <div class="chapter-rule"><span class="chapter-rule-diamond">◆</span></div>
-      <p class="chapter-ornament">❧</p>
-    </div>
-
-    <div class="invite-content reveal">
-      <p class="invite-text">
-        If somewhere in all this you smiled, even a little…<br>
-        then let this be the start of something, not the end of it.<br>
-        We haven't met yet — but I'd really like to fix that.
-      </p>
-
-      <p class="invite-contact">
-        Call me. Text me. Whatsapp me.<br> 7005106501 <br>
-        I'll be waiting on the other side, counting down the miles.
-      </p>
-
-      <a href="tel:7005106501" class="invite-btn">✧ Reach Me ✧</a>
-    </div>
-  </section>
-
-  <!-- Hidden audio element -->
-  <audio id="ambientAudio" loop>
-    <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=" type="audio/wav">
-  </audio>
-  <!-- MEMORY LIGHTBOX -->
-
-  <div id="memoryLightbox" class="memory-lightbox">
-
-    <button id="closeLightbox" class="lightbox-close">
-      ✕
-    </button>
-
-    <img id="lightboxImage" class="lightbox-image" src="" alt="Expanded memory">
-
   </div>
+</section>
 
-  <script>
-    // ── ENVELOPE INTERACTION ──
-    const envelope = document.getElementById('envelope');
-    const openBtn = document.getElementById('openLetter');
-    const closeBtn = document.getElementById('closeLetter');
-    const overlay = document.getElementById('envelopeOverlay');
+<!-- ENDING -->
+<section id="ending" class="closing" data-reveal>
+  <div class="kicker">the final chapter</div>
+  <p class="lede">This whole little page is everything I can't always say out loud: that I notice you, the real you, under the black dress and the confidence and the walls you don't let down for just anyone. That I love your softness precisely because you guard it so carefully.<br><br>Happy birthday, Ilo. This one's for you. All of it is for you, and I can't wait for the day the distance finally runs out.</p>
+  <div class="mark3"><span class="dot-accent">·</span> <span class="dot-accent">·</span> <span class="dot-accent">·</span></div>
+  <div class="sig"><span class="dot-accent">·</span> Mike</div>
+</section>
 
-    openBtn.addEventListener('click', () => {
-      envelope.classList.add('open');
-    });
+<!-- INVITE -->
+<section id="invite" class="band invite" data-reveal>
+  <div class="wrap">
+    <div class="kicker" style="text-align:center">a quiet invitation</div>
+    <h2>Before you close <em>this page.</em></h2>
+    <p class="lede">If somewhere in all this you smiled, even a little, then let this be the start of something, not the end of it. We haven't met yet, but I'd really like to fix that.</p>
+    <div class="contact">Call me. Text me. WhatsApp me.<br>7005106501<br>I'll be waiting on the other side, counting down the miles.</div>
+    <a href="tel:7005106501" class="btn">Reach me</a>
+  </div>
+</section>
 
-    closeBtn.addEventListener('click', () => {
-      overlay.style.display = 'none';
-    });
-    // ── DUST PARTICLES ──
-    (function () {
-      const container = document.getElementById('particles');
-      const count = window.innerWidth < 600 ? 18 : 35;
+<footer class="wrap">
+  <span>written across the distance</span>
+  <span>Ilo ✦ happy birthday</span>
+</footer>
 
-      for (let i = 0; i < count; i++) {
-        const d = document.createElement('div');
-        d.className = 'dust';
-        const size = Math.random() * 4 + 1;
-        const duration = Math.random() * 25 + 18;
-        const delay = Math.random() * 15;
-        const x = Math.random() * 100;
-        const drift = (Math.random() - 0.5) * 200;
+<!-- LIGHTBOX -->
+<div id="memoryLightbox" class="lightbox">
+  <button id="closeLightbox" class="lb-close"><span class="iconify" data-icon="solar:close-square-linear"></span></button>
+  <img id="lightboxImage" src="" alt="Expanded memory">
+</div>
 
-        d.style.cssText = `
-      width: ${size}px;
-      height: ${size}px;
-      left: ${x}%;
-      bottom: -10px;
-      --drift: ${drift}px;
-      animation-duration: ${duration}s;
-      animation-delay: ${delay}s;
-      opacity: 0;
-    `;
-        container.appendChild(d);
-      }
-    })();
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lenis/1.1.13/lenis.min.js"></script>
+<script>
+(function(){
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  gsap.registerPlugin(ScrollTrigger);
 
-    // ── VICTORIAN ORCHESTRAL MUSIC ENGINE ──
-    (function () {
-      const btn = document.getElementById('musicBtn');
-      let isPlaying = false;
-      let ctx = null;
-      let masterGain = null;
-      let schedulerTimer = null;
-      let allNodes = [];
+  var heroLines = document.querySelectorAll('.hero h1 .line');
+  var eyebrow = document.querySelector('.hero .eyebrow .ov span');
 
-      // Frequencies — G major / E minor (Pride & Prejudice, Becoming Jane feel)
-      const N = {
-        G1: 49.00, D2: 73.42, G2: 98.00, A2: 110.00, B2: 123.47, C2: 65.41, E2: 82.41,
-        G3: 196.00, A3: 220.00, B3: 246.94, C3: 130.81, D3: 146.83, E3: 164.81, Fs3: 185.00,
-        G4: 392.00, A4: 440.00, B4: 493.88, C4: 261.63, D4: 293.66, E4: 329.63, Fs4: 369.99,
-        G5: 783.99, A5: 880.00, B5: 987.77, C5: 523.25, D5: 587.33, E5: 659.25, Fs5: 739.99,
-      };
+  var lenis;
+  if(!reduced && window.Lenis){
+    lenis = new Lenis({ duration: 1.15, smoothWheel: true });
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add(function(time){ lenis.raf(time * 1000); });
+    gsap.ticker.lagSmoothing(0);
+  }
 
-      // ── MELODY: lilting G major waltz — tender, hopeful, bittersweet
-      // Like a music box meeting a chamber violin in a candlelit drawing room
-      const MELODY = [
-        // Phrase A — delicate opening
-        ['D4', 0, 0.5, 0.52], ['G4', 0.5, 0.5, 0.58], ['B4', 1, 1, 0.62],
-        ['A4', 2, 0.5, 0.55], ['G4', 2.5, 0.5, 0.52], ['Fs4', 3, 1, 0.50],
-        ['G4', 4, 1, 0.58], ['B4', 5, 0.5, 0.55], ['D5', 5.5, 0.5, 0.62],
-        ['E5', 6, 1.5, 0.65], ['D5', 7.5, 0.5, 0.55],
-        // Phrase A2 — echo, warmer
-        ['B4', 8, 0.5, 0.52], ['D5', 8.5, 0.5, 0.58], ['G5', 9, 1.5, 0.68],
-        ['Fs5', 10.5, 0.5, 0.60], ['E5', 11, 1, 0.58],
-        ['D5', 12, 1, 0.62], ['B4', 13, 0.5, 0.55], ['A4', 13.5, 0.5, 0.50],
-        ['G4', 14, 2, 0.65],
-        // Phrase B — yearning climb
-        ['D4', 16, 0.5, 0.50], ['E4', 16.5, 0.5, 0.52], ['Fs4', 17, 0.5, 0.55],
-        ['G4', 17.5, 0.5, 0.58], ['A4', 18, 1, 0.62],
-        ['B4', 19, 1, 0.65], ['C5', 20, 1, 0.68], ['D5', 21, 1, 0.72],
-        ['E5', 22, 2, 0.75],
-        // Phrase B2 — tender descent
-        ['D5', 24, 1, 0.68], ['C5', 25, 0.5, 0.62], ['B4', 25.5, 0.5, 0.58],
-        ['A4', 26, 1, 0.55], ['Fs4', 27, 1, 0.50],
-        ['G4', 28, 4, 0.65],
-        // Phrase C — emotional heart, swells like a glance across the ballroom
-        ['G4', 32, 1, 0.60], ['A4', 33, 0.5, 0.62], ['B4', 33.5, 0.5, 0.65],
-        ['C5', 34, 1, 0.70], ['D5', 35, 1, 0.75],
-        ['E5', 36, 1.5, 0.78], ['D5', 37.5, 0.5, 0.68], ['C5', 38, 1, 0.65],
-        ['B4', 39, 1, 0.62],
-        ['A4', 40, 0.5, 0.60], ['G4', 40.5, 0.5, 0.55], ['Fs4', 41, 1, 0.52],
-        ['G4', 42, 1, 0.60], ['A4', 43, 1, 0.55],
-        ['B4', 44, 4, 0.65],
-        // Phrase D — intimate close, like a letter kept forever
-        ['G4', 48, 1, 0.50], ['Fs4', 49, 0.5, 0.45], ['G4', 49.5, 0.5, 0.50],
-        ['A4', 50, 1, 0.52], ['G4', 51, 1, 0.48],
-        ['E4', 52, 1, 0.45], ['D4', 53, 1, 0.48],
-        ['G4', 54, 2, 0.55],
-        ['D4', 56, 1, 0.45], ['G4', 57, 3, 0.52],
-      ];
+  function scrollToEl(el){
+    if(lenis){ lenis.scrollTo(el, { duration: 1.2 }); }
+    else { el.scrollIntoView({ behavior:'smooth' }); }
+  }
 
-      // ── BASS: pizzicato cello — plucked, rhythmic, graceful 3/4 pulse
-      const BASS = [
-        ['G1', 0, 0.4, 0.55], ['D2', 1, 0.4, 0.40], ['D2', 2, 0.4, 0.38],
-        ['D2', 3, 0.4, 0.40], ['A2', 4, 0.4, 0.52], ['A2', 5, 0.4, 0.40],
-        ['C2', 6, 0.4, 0.40], ['C2', 7, 0.4, 0.36],
-        ['G1', 8, 0.4, 0.55], ['D2', 9, 0.4, 0.40], ['D2', 10, 0.4, 0.38],
-        ['B2', 11, 0.4, 0.40], ['G1', 12, 0.4, 0.50], ['D2', 13, 0.4, 0.40],
-        ['D2', 14, 0.4, 0.38], ['D2', 15, 0.4, 0.36],
-        ['G1', 16, 0.4, 0.55], ['D2', 17, 0.4, 0.40], ['A2', 18, 0.4, 0.45],
-        ['A2', 19, 0.4, 0.40], ['C2', 20, 0.4, 0.48], ['G2', 21, 0.4, 0.40],
-        ['D2', 22, 0.4, 0.42], ['D2', 23, 0.4, 0.38],
-        ['G1', 24, 0.4, 0.55], ['D2', 25, 0.4, 0.40], ['A2', 26, 0.4, 0.40],
-        ['D2', 27, 0.4, 0.38], ['G1', 28, 0.6, 0.58], ['D2', 29, 0.4, 0.40],
-        ['G1', 30, 0.4, 0.50], ['D2', 31, 0.4, 0.36],
-        ['G1', 32, 0.4, 0.55], ['D2', 33, 0.4, 0.40], ['C2', 34, 0.4, 0.45],
-        ['G2', 35, 0.4, 0.40], ['A2', 36, 0.4, 0.50], ['E2', 37, 0.4, 0.40],
-        ['D2', 38, 0.4, 0.42], ['D2', 39, 0.4, 0.38],
-        ['G1', 40, 0.4, 0.55], ['D2', 41, 0.4, 0.40], ['A2', 42, 0.4, 0.42],
-        ['D2', 43, 0.4, 0.38], ['G1', 44, 0.6, 0.60], ['D2', 45, 0.4, 0.40],
-        ['G1', 46, 0.4, 0.50], ['D2', 47, 0.4, 0.36],
-        ['G1', 48, 0.4, 0.50], ['D2', 49, 0.4, 0.38], ['G2', 50, 0.4, 0.40],
-        ['D2', 51, 0.4, 0.36], ['C2', 52, 0.4, 0.45], ['G2', 53, 0.4, 0.38],
-        ['D2', 54, 0.4, 0.40], ['G1', 56, 0.6, 0.55], ['D2', 57, 0.4, 0.38],
-        ['G1', 58, 0.8, 0.50],
-      ];
+  function ready(){
+    document.querySelector('.veil').classList.add('hide');
 
-      // ── PADS: warm sustained string quartet chords
-      const PADS = [
-        [['G3', 'B3', 'D4'], 0, 4, 0.20],
-        [['A3', 'C4', 'E4'], 4, 4, 0.18],
-        [['C3', 'E3', 'G3'], 8, 4, 0.20],
-        [['G3', 'B3', 'D4'], 12, 4, 0.22],
-        [['G3', 'B3', 'D4'], 16, 2, 0.18],
-        [['A3', 'C4', 'E4'], 18, 2, 0.18],
-        [['C3', 'G3', 'C4'], 20, 4, 0.20],
-        [['G3', 'Fs3', 'D4'], 24, 4, 0.20],
-        [['G3', 'B3', 'D4'], 28, 4, 0.24],
-        [['G3', 'B3', 'E4'], 32, 4, 0.20],
-        [['A3', 'C4', 'E4'], 36, 4, 0.22],
-        [['G3', 'B3', 'D4'], 40, 4, 0.20],
-        [['G3', 'B3', 'D4'], 44, 4, 0.22],
-        [['G3', 'B3', 'D4'], 48, 4, 0.18],
-        [['C3', 'E3', 'G3'], 52, 4, 0.18],
-        [['G3', 'B3', 'D4'], 56, 4, 0.20],
-      ];
-
-      const BEAT = 0.45;   // ~133 bpm — light, dancing waltz like a country house ball
-      const TOTAL_BEATS = 60;
-
-      // ── REVERB: long cathedral hall
-      function buildReverb(actx) {
-        const conv = actx.createConvolver();
-        const sr = actx.sampleRate, len = sr * 3.5;
-        const buf = actx.createBuffer(2, len, sr);
-        for (let ch = 0; ch < 2; ch++) {
-          const d = buf.getChannelData(ch);
-          for (let i = 0; i < len; i++)
-            d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 1.4);
-        }
-        conv.buffer = buf; return conv;
-      }
-
-      // ── STRING tone: sawtooth + filter = bowed strings warmth
-      function playString(actx, dest, freq, t, dur, vol) {
-        const env = actx.createGain();
-        env.gain.setValueAtTime(0, t);
-        env.gain.linearRampToValueAtTime(vol, t + 0.18);       // slow bow attack
-        env.gain.setValueAtTime(vol, t + dur - 0.25);
-        env.gain.linearRampToValueAtTime(0, t + dur + 0.15);
-        env.connect(dest); allNodes.push(env);
-
-        // Vibrato LFO
-        const lfo = actx.createOscillator();
-        const lfoG = actx.createGain();
-        lfo.frequency.value = 5.2;
-        lfoG.gain.value = freq * 0.012;
-        lfo.connect(lfoG); allNodes.push(lfo, lfoG);
-
-        [1, 2, 3, 4, 5].forEach((h, i) => {
-          const osc = actx.createOscillator();
-          const hG = actx.createGain();
-          const filt = actx.createBiquadFilter();
-          osc.type = 'sawtooth';
-          osc.frequency.value = freq * h;
-          filt.type = 'lowpass';
-          filt.frequency.value = 1800 - i * 200;
-          filt.Q.value = 0.8;
-          hG.gain.value = [0.5, 0.3, 0.15, 0.08, 0.04][i];
-          lfoG.connect(osc.frequency);
-          osc.connect(filt); filt.connect(hG); hG.connect(env);
-          osc.start(t); osc.stop(t + dur + 0.3);
-          allNodes.push(osc, hG, filt);
-        });
-        lfo.start(t); lfo.stop(t + dur + 0.3);
-      }
-
-      // ── CELLO/BASS tone: richer, darker
-      function playBass(actx, dest, freq, t, dur, vol) {
-        const env = actx.createGain();
-        env.gain.setValueAtTime(0, t);
-        env.gain.linearRampToValueAtTime(vol, t + 0.25);
-        env.gain.setValueAtTime(vol * 0.85, t + dur - 0.3);
-        env.gain.linearRampToValueAtTime(0, t + dur + 0.2);
-        env.connect(dest); allNodes.push(env);
-
-        [1, 2, 3].forEach((h, i) => {
-          const osc = actx.createOscillator();
-          const hG = actx.createGain();
-          const filt = actx.createBiquadFilter();
-          osc.type = h === 1 ? 'sawtooth' : 'sine';
-          osc.frequency.value = freq * h;
-          filt.type = 'lowpass'; filt.frequency.value = 600;
-          hG.gain.value = [0.6, 0.25, 0.1][i];
-          osc.connect(filt); filt.connect(hG); hG.connect(env);
-          osc.start(t); osc.stop(t + dur + 0.4);
-          allNodes.push(osc, hG, filt);
-        });
-      }
-
-      // ── MELODY tone: warm violin solo — sawtooth + vibrato + brightness
-      function playMelody(actx, dest, freq, t, dur, vol) {
-        const env = actx.createGain();
-        env.gain.setValueAtTime(0, t);
-        env.gain.linearRampToValueAtTime(vol, t + 0.08);
-        env.gain.setValueAtTime(vol, t + dur - 0.12);
-        env.gain.linearRampToValueAtTime(0, t + dur + 0.08);
-        env.connect(dest); allNodes.push(env);
-
-        const lfo = actx.createOscillator();
-        const lfoG = actx.createGain();
-        lfo.frequency.value = 5.8;
-        lfoG.gain.value = freq * 0.018;
-        lfo.connect(lfoG); allNodes.push(lfo, lfoG);
-
-        [1, 2, 3, 4].forEach((h, i) => {
-          const osc = actx.createOscillator();
-          const hG = actx.createGain();
-          const filt = actx.createBiquadFilter();
-          osc.type = 'sawtooth';
-          osc.frequency.value = freq * h;
-          filt.type = 'lowpass'; filt.frequency.value = 3500 - i * 500; filt.Q.value = 1.2;
-          hG.gain.value = [0.55, 0.28, 0.12, 0.05][i];
-          lfoG.connect(osc.frequency);
-          osc.connect(filt); filt.connect(hG); hG.connect(env);
-          osc.start(t); osc.stop(t + dur + 0.2);
-          allNodes.push(osc, hG, filt);
-        });
-        lfo.start(t); lfo.stop(t + dur + 0.2);
-      }
-
-      function startMusic() {
-        ctx = new (window.AudioContext || window.webkitAudioContext)();
-        masterGain = ctx.createGain();
-        masterGain.gain.setValueAtTime(0, ctx.currentTime);
-        masterGain.gain.linearRampToValueAtTime(0.78, ctx.currentTime + 3);
-        masterGain.connect(ctx.destination);
-
-        const reverb = buildReverb(ctx);
-        const reverbGain = ctx.createGain(); reverbGain.gain.value = 0.50;
-        reverb.connect(reverbGain); reverbGain.connect(masterGain);
-
-        const dry = ctx.createGain(); dry.gain.value = 0.52; dry.connect(masterGain);
-
-        // Three instrument buses
-        const melBus = ctx.createGain(); melBus.gain.value = 1.0;
-        const bassBus = ctx.createGain(); bassBus.gain.value = 0.90;
-        const padBus = ctx.createGain(); padBus.gain.value = 0.80;
-
-        [melBus, bassBus, padBus].forEach(b => {
-          b.connect(dry); b.connect(reverb);
-        });
-
-        allNodes.push(reverb, reverbGain, dry, melBus, bassBus, padBus);
-
-        function scheduleLoop(loopStart) {
-          MELODY.forEach(([note, beat, dur, vol]) => {
-            const t = loopStart + beat * BEAT;
-            if (t >= ctx.currentTime - 0.1 && N[note])
-              playMelody(ctx, melBus, N[note], t, dur * BEAT, vol);
-          });
-          BASS.forEach(([note, beat, dur, vol]) => {
-            const t = loopStart + beat * BEAT;
-            if (t >= ctx.currentTime - 0.1 && N[note])
-              playBass(ctx, bassBus, N[note], t, dur * BEAT, vol);
-          });
-          PADS.forEach(([notes, beat, dur, vol]) => {
-            notes.forEach((note, i) => {
-              const t = loopStart + beat * BEAT + i * 0.06;
-              if (t >= ctx.currentTime - 0.1 && N[note])
-                playString(ctx, padBus, N[note], t, dur * BEAT, vol);
-            });
-          });
-          const loopLen = TOTAL_BEATS * BEAT;
-          const next = loopStart + loopLen;
-          schedulerTimer = setTimeout(() => scheduleLoop(next), Math.max(100, (next - ctx.currentTime - 1.5) * 1000));
-        }
-
-        scheduleLoop(ctx.currentTime + 0.2);
-      }
-
-      function stopMusic() {
-        clearTimeout(schedulerTimer);
-        if (masterGain) {
-          masterGain.gain.cancelScheduledValues(ctx.currentTime);
-          masterGain.gain.setValueAtTime(masterGain.gain.value, ctx.currentTime);
-          masterGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 2);
-          setTimeout(() => {
-            allNodes.forEach(n => { try { n.disconnect(); } catch (e) { } });
-            allNodes = [];
-            try { ctx.close(); } catch (e) { }
-            ctx = null; masterGain = null;
-          }, 2500);
-        }
-      }
-
-      btn.addEventListener('click', () => {
-        if (!isPlaying) {
-          startMusic();
-          isPlaying = true;
-          btn.innerHTML = '♬';
-          btn.style.background = 'var(--gold)';
-          btn.style.color = 'var(--ink)';
-          btn.title = 'Pause music';
-        } else {
-          stopMusic();
-          isPlaying = false;
-          btn.innerHTML = '♪';
-          btn.style.background = 'var(--burgundy)';
-          btn.style.color = 'var(--gold-light)';
-          btn.title = 'Play ambient music';
-        }
-      });
-    })();
-
-    // ── SCROLL REVEAL ──
-    (function () {
-      const reveals = document.querySelectorAll('.reveal, .reveal-stagger');
-
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(e => {
-          if (e.isIntersecting) {
-            e.target.classList.add('visible');
-          }
-        });
-      }, { threshold: 0.12 });
-
-      reveals.forEach(el => observer.observe(el));
-    })();
-
-    // ── NAV DOTS ──
-    (function () {
-      const dots = document.querySelectorAll('.nav-dot');
-      const sections = [
-        'cover',
-        'about',
-        'lovenotes',
-        'memories',
-        'quotes',
-        'mixtape',
-        'ending',
-        'invite'
-      ];
-      dots.forEach((dot, i) => {
-        dot.addEventListener('click', () => {
-          document.getElementById(sections[i]).scrollIntoView({ behavior: 'smooth' });
-        });
-      });
-
-      const sectionEls = sections.map(id => document.getElementById(id));
-
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(e => {
-          if (e.isIntersecting && e.intersectionRatio > 0.3) {
-            const idx = sectionEls.indexOf(e.target);
-            dots.forEach(d => d.classList.remove('active'));
-            if (idx !== -1) dots[idx].classList.add('active');
-          }
-        });
-      }, { threshold: 0.3 });
-
-      sectionEls.forEach(el => el && observer.observe(el));
-    })();
-
-    /* ── MIXTAPE PLAYER ── */
-    /* ── MIXTAPE PLAYER ── */
-
-    const vinyl = document.getElementById('vinyl');
-    const tonearm = document.getElementById('tonearm');
-
-    const audio = document.getElementById('mixtapeAudio');
-
-    const playBtn = document.getElementById('playPauseBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const prevBtn = document.getElementById('prevBtn');
-
-    const tracks = document.querySelectorAll('.track');
-
-    const songs = [
-
-      {
-        title: "Mexican Girl",
-        file: "MexicanGirl.mp3"
-      },
-      {
-        title: "Dive (Ellie's Version)",
-        file: "Dive.mp3"
-      },
-      {
-        title: "Just the Way You Are",
-        file: "JustTheWayYouAre.mp3"
-      },
-
-      {
-        title: "Los Angeles",
-        file: "TheMidnightLosAngeles.mp3"
-      },
-
-      {
-        title: "I Don't Want to Miss a Thing",
-        file: "DontWanttoMissaThing.mp3"
-      },
-
-      {
-        title: "Treasure",
-        file: "Treasure.mp3"
-      },
-
-
-
-      {
-        title: "Robbers",
-        file: "The1975Robbers.mp3"
-      },
-
-      {
-        title: "Next To You",
-        file: "NexttoYou.mp3"
-      },
-
-      {
-        title: "Miss Atomic Bomb",
-        file: "MissAtomicBomb.mp3"
-      },
-
-      {
-        title: "Versace on the Floor",
-        file: "VersaceontheFloor.mp3"
-      },
-
-      {
-        title: "Uptown Girl",
-        file: "UptownGirl.mp3"
-      },
-
-      {
-        title: "Teenage Dirtbag",
-        file: "TeenageDirtbag.mp3"
-      },
-
-      {
-        title: "Open Arms",
-        file: "OpenArms.mp3"
-      },
-
-      {
-        title: "Pakx - Anyone (Zouk Cover Remix)",
-        file: "Anyone.mp3"
-      }
-
-    ];
-
-    let currentSong = 0;
-
-    function loadSong(index) {
-
-      audio.src = songs[index].file;
-
-      tracks.forEach(track => {
-        track.classList.remove('active-track');
-      });
-
-      tracks[index].classList.add('active-track');
+    if(reduced){
+      gsap.set(['.hero .sub', '.hero .sig', '.scrollcue'], { opacity:1 });
+      return;
     }
 
-    function playSong() {
+    var tl = gsap.timeline({ delay: 0.3 });
+    tl.fromTo(eyebrow, { yPercent:120, opacity:0 }, { yPercent:0, opacity:1, duration:0.7, ease:'power3.out' })
+      .fromTo(heroLines, { yPercent:120 }, { yPercent:0, duration:1, ease:'power4.out', stagger:0.12 }, '-=0.25')
+      .fromTo('.hero .sub', { opacity:0, y:14 }, { opacity:1, y:0, duration:0.8, ease:'power2.out' }, '-=0.5')
+      .fromTo('.hero .sig', { opacity:0, y:14 }, { opacity:1, y:0, duration:0.8, ease:'power2.out' }, '-=0.5');
 
-      audio.play();
+    document.querySelectorAll('[data-reveal] h2, [data-reveal] .kicker').forEach(function(el){
+      gsap.fromTo(el, { opacity:0, y:24 }, { opacity:1, y:0, duration:0.9, ease:'power3.out',
+        scrollTrigger:{ trigger: el, start:'top 85%' } });
+    });
+    document.querySelectorAll('[data-reveal] .lede, [data-reveal] .body, [data-reveal] .pull').forEach(function(el){
+      gsap.fromTo(el, { opacity:0, y:18 }, { opacity:1, y:0, duration:0.9, ease:'power3.out',
+        scrollTrigger:{ trigger: el, start:'top 88%' } });
+    });
+    gsap.utils.toArray('.qrow').forEach(function(el){
+      gsap.fromTo(el, { opacity:0, y:16 }, { opacity:1, y:0, duration:0.7, ease:'power2.out',
+        scrollTrigger:{ trigger: el, start:'top 92%' } });
+    });
 
-      vinyl.classList.add('playing');
-      tonearm.classList.add('playing');
+    /* love notes: unfold, like a letter opening under the fold */
+    gsap.utils.toArray('.letter-card').forEach(function(el){
+      gsap.fromTo(el, { clipPath:'inset(0 0 100% 0)' }, { clipPath:'inset(0 0 0% 0)', duration:1.1, ease:'power3.inOut',
+        scrollTrigger:{ trigger: el, start:'top 90%' } });
+    });
 
-      playBtn.innerHTML = '❚❚';
+    /* memories, the peak: each frame develops as it's scrolled into view */
+    gsap.utils.toArray('.memcard').forEach(function(card, i){
+      gsap.set(card, { '--dev': 0 });
+      gsap.to(card, { '--dev': 1, ease:'none',
+        scrollTrigger:{ trigger: card, start:'top 96%', end:'top 45%', scrub:0.6,
+          onUpdate: function(self){ card.classList.toggle('developed', self.progress > 0.97); } } });
+      gsap.fromTo(card, { y: i % 2 ? 44 : 60 }, { y: i % 2 ? 34 : 0, duration:1,
+        scrollTrigger:{ trigger: card, start:'top 96%', end:'top 55%', scrub:0.6 } });
+    });
+    gsap.fromTo('.measure', { opacity:0, y:16 }, { opacity:1, y:0, duration:1, ease:'power2.out',
+      scrollTrigger:{ trigger:'.measure', start:'top 88%' } });
+    gsap.fromTo('#ending .sig, #ending .mark3', { opacity:0, y:14 }, { opacity:1, y:0, duration:1, ease:'power2.out',
+      scrollTrigger:{ trigger:'#ending', start:'top 60%' } });
+    gsap.fromTo('.player, .tracklist', { opacity:0, y:20 }, { opacity:1, y:0, duration:0.9, ease:'power3.out',
+      scrollTrigger:{ trigger:'.mix-wrap', start:'top 85%' } });
+    gsap.fromTo('.invite .btn', { opacity:0, y:14 }, { opacity:1, y:0, duration:0.8, ease:'power2.out',
+      scrollTrigger:{ trigger:'.invite', start:'top 70%' } });
+
+    var path = document.getElementById('distancePath');
+    if(path){
+      var len = path.getTotalLength();
+      path.style.strokeDasharray = len;
+      path.style.strokeDashoffset = len;
+      gsap.to(path, { strokeDashoffset: 0, duration: 1.6, ease:'power2.inOut',
+        scrollTrigger:{ trigger:'.distance-wrap', start:'top 80%' },
+        onComplete:function(){ path.style.strokeDasharray = '4 6'; } });
     }
+    gsap.utils.toArray('.distance-svg .pt-ring').forEach(function(ring, i){
+      gsap.fromTo(ring, { scale:0, transformOrigin:'center' }, { scale:1, duration:0.8, ease:'back.out(2)', delay: i*0.15,
+        scrollTrigger:{ trigger:'.distance-wrap', start:'top 80%' } });
+    });
 
-    function pauseSong() {
+    ScrollTrigger.refresh();
+  }
 
-      audio.pause();
+  window.addEventListener('load', function(){ setTimeout(ready, 250); });
+  setTimeout(function(){
+    if(document.querySelector('.veil') && !document.querySelector('.veil').classList.contains('hide')) ready();
+  }, 1800);
 
-      vinyl.classList.remove('playing');
-      tonearm.classList.remove('playing');
+  /* dot nav */
+  var dots = document.querySelectorAll('.dotnav .dot');
+  var sectionIds = ['cover','about','distance','lovenotes','memories','quotes','mixtape','ending','invite'];
+  var sectionEls = sectionIds.map(function(id){ return document.getElementById(id); });
+  dots.forEach(function(dot, i){
+    dot.addEventListener('click', function(){ scrollToEl(sectionEls[i]); });
+  });
+  var dotObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(entry){
+      if(entry.isIntersecting && entry.intersectionRatio > 0.3){
+        var idx = sectionEls.indexOf(entry.target);
+        dots.forEach(function(d){ d.classList.remove('active'); });
+        if(idx !== -1) dots[idx].classList.add('active');
+      }
+    });
+  }, { threshold: 0.3 });
+  sectionEls.forEach(function(el){ if(el) dotObserver.observe(el); });
+})();
 
-      playBtn.innerHTML = '▶';
+/* ── MIXTAPE PLAYER ── */
+(function(){
+  var vinyl = document.getElementById('vinyl');
+  var audio = document.getElementById('mixtapeAudio');
+  var playBtn = document.getElementById('playPauseBtn');
+  var nextBtn = document.getElementById('nextBtn');
+  var prevBtn = document.getElementById('prevBtn');
+  var tracks = document.querySelectorAll('.track');
+  var timeline = document.getElementById('timeline');
+  var currentTimeEl = document.getElementById('currentTime');
+  var durationEl = document.getElementById('duration');
+
+  var songs = [
+    { title:"Mexican Girl", file:"MexicanGirl.mp3" },
+    { title:"Dive (Ellie's Version)", file:"Dive.mp3" },
+    { title:"Just the Way You Are", file:"JustTheWayYouAre.mp3" },
+    { title:"Los Angeles", file:"TheMidnightLosAngeles.mp3" },
+    { title:"I Don't Want to Miss a Thing", file:"DontWanttoMissaThing.mp3" },
+    { title:"Treasure", file:"Treasure.mp3" },
+    { title:"Robbers", file:"The1975Robbers.mp3" },
+    { title:"Next To You", file:"NexttoYou.mp3" },
+    { title:"Miss Atomic Bomb", file:"MissAtomicBomb.mp3" },
+    { title:"Versace on the Floor", file:"VersaceontheFloor.mp3" },
+    { title:"Uptown Girl", file:"UptownGirl.mp3" },
+    { title:"Teenage Dirtbag", file:"TeenageDirtbag.mp3" },
+    { title:"Open Arms", file:"OpenArms.mp3" },
+    { title:"Pakx - Anyone (Zouk Cover Remix)", file:"Anyone.mp3" }
+  ];
+  var currentSong = 0;
+
+  function loadSong(index){
+    audio.src = songs[index].file;
+    tracks.forEach(function(t){ t.classList.remove('active-track'); });
+    tracks[index].classList.add('active-track');
+  }
+  function playSong(){
+    audio.play().catch(function(){});
+    vinyl.classList.add('playing');
+    playBtn.classList.add('is-playing');
+  }
+  function pauseSong(){
+    audio.pause();
+    vinyl.classList.remove('playing');
+    playBtn.classList.remove('is-playing');
+  }
+  playBtn.addEventListener('click', function(){ audio.paused ? playSong() : pauseSong(); });
+  nextBtn.addEventListener('click', function(){
+    currentSong = (currentSong + 1) % songs.length; loadSong(currentSong); playSong();
+  });
+  prevBtn.addEventListener('click', function(){
+    currentSong = (currentSong - 1 + songs.length) % songs.length; loadSong(currentSong); playSong();
+  });
+  tracks.forEach(function(track, index){
+    track.addEventListener('click', function(){ currentSong = index; loadSong(currentSong); playSong(); });
+  });
+  audio.addEventListener('ended', function(){
+    currentSong = (currentSong + 1) % songs.length; loadSong(currentSong); playSong();
+  });
+  loadSong(currentSong);
+
+  function formatTime(t){
+    var m = Math.floor(t/60), s = Math.floor(t%60);
+    return m + ':' + (s<10?'0':'') + s;
+  }
+  audio.addEventListener('timeupdate', function(){
+    if(audio.duration){
+      timeline.value = (audio.currentTime/audio.duration)*100;
+      timeline.style.setProperty('--fill', timeline.value + '%');
+      currentTimeEl.textContent = formatTime(audio.currentTime);
     }
+  });
+  audio.addEventListener('loadedmetadata', function(){ durationEl.textContent = formatTime(audio.duration); });
+  timeline.addEventListener('input', function(){
+    if(audio.duration) audio.currentTime = (timeline.value/100)*audio.duration;
+    timeline.style.setProperty('--fill', timeline.value + '%');
+  });
 
-    playBtn.addEventListener('click', () => {
+  /* memory lightbox */
+  var memcards = document.querySelectorAll('.memcard');
+  var lightbox = document.getElementById('memoryLightbox');
+  var lightboxImage = document.getElementById('lightboxImage');
+  var closeLightbox = document.getElementById('closeLightbox');
 
-      if (audio.paused) {
-        playSong();
-      } else {
-        pauseSong();
+  memcards.forEach(function(card){
+    card.addEventListener('click', function(){
+      var img = card.querySelector('img');
+      if(img){
+        lightbox.classList.add('show');
+        lightboxImage.src = img.src;
+        document.body.style.overflow = 'hidden';
       }
-
     });
-
-    nextBtn.addEventListener('click', () => {
-
-      currentSong++;
-
-      if (currentSong >= songs.length) {
-        currentSong = 0;
-      }
-
-      loadSong(currentSong);
-      playSong();
-
-    });
-
-    prevBtn.addEventListener('click', () => {
-
-      currentSong--;
-
-      if (currentSong < 0) {
-        currentSong = songs.length - 1;
-      }
-
-      loadSong(currentSong);
-      playSong();
-
-    });
-
-    tracks.forEach((track, index) => {
-
-      track.addEventListener('click', () => {
-
-        currentSong = index;
-
-        loadSong(currentSong);
-        playSong();
-
-      });
-
-    });
-
-    audio.addEventListener('ended', () => {
-
-      currentSong++;
-
-      if (currentSong >= songs.length) {
-        currentSong = 0;
-      }
-
-      loadSong(currentSong);
-      playSong();
-
-    });
-
-    loadSong(currentSong);
-    const timeline = document.getElementById('timeline');
-
-    const currentTimeEl = document.getElementById('currentTime');
-    const durationEl = document.getElementById('duration');
-
-    /* format time */
-
-    function formatTime(time) {
-
-      const mins = Math.floor(time / 60);
-      const secs = Math.floor(time % 60);
-
-      return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-    }
-
-    /* update timeline */
-
-    audio.addEventListener('timeupdate', () => {
-
-      if (audio.duration) {
-
-        const progress =
-          (audio.currentTime / audio.duration) * 100;
-
-        timeline.value = progress;
-
-        currentTimeEl.textContent =
-          formatTime(audio.currentTime);
-
-      }
-
-    });
-
-    /* song duration */
-
-    audio.addEventListener('loadedmetadata', () => {
-
-      durationEl.textContent =
-        formatTime(audio.duration);
-
-    });
-
-    /* seek */
-
-    timeline.addEventListener('input', () => {
-
-      if (audio.duration) {
-
-        audio.currentTime =
-          (timeline.value / 100) * audio.duration;
-
-      }
-
-    });
-
-    // modal
-    const memoryCards =
-      document.querySelectorAll('.memory-card');
-
-    const lightbox =
-      document.getElementById('memoryLightbox');
-
-    const lightboxImage =
-      document.getElementById('lightboxImage');
-
-    const closeLightbox =
-      document.getElementById('closeLightbox');
-
-    /* open */
-
-    memoryCards.forEach(card => {
-
-      card.addEventListener('click', () => {
-
-        const img =
-          card.querySelector('.memory-photo');
-
-        if (img) {
-
-          lightbox.classList.add('show');
-
-          lightboxImage.src = img.src;
-
-          document.body.style.overflow = 'hidden';
-
-        }
-
-      });
-
-    });
-
-    /* close button */
-
-    closeLightbox.addEventListener('click', () => {
-
-      lightbox.classList.remove('show');
-
-      document.body.style.overflow = '';
-
-    });
-
-    /* close outside image */
-
-    lightbox.addEventListener('click', (e) => {
-
-      if (e.target === lightbox) {
-
-        lightbox.classList.remove('show');
-
-        document.body.style.overflow = '';
-
-      }
-
-    });
-
-    /* escape key */
-
-    document.addEventListener('keydown', (e) => {
-
-      if (e.key === 'Escape') {
-
-        lightbox.classList.remove('show');
-
-        document.body.style.overflow = '';
-
-      }
-
-    });
-    // end modal
-  </script>
-
+  });
+  closeLightbox.addEventListener('click', function(){
+    lightbox.classList.remove('show'); document.body.style.overflow = '';
+  });
+  lightbox.addEventListener('click', function(e){
+    if(e.target === lightbox){ lightbox.classList.remove('show'); document.body.style.overflow = ''; }
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){ lightbox.classList.remove('show'); document.body.style.overflow = ''; }
+  });
+})();
+</script>
 </body>
-
 </html>
