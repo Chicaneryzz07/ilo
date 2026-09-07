@@ -233,6 +233,41 @@
     min-height: 16px;
   }
 
+  .personalize {
+    margin-top: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .personalize label {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+  .personalize label:first-child { margin-top: 0; }
+  .personalize input {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    color: var(--paper);
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(239,230,216,0.16);
+    border-radius: 8px;
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color 150ms ease;
+  }
+  .personalize input:focus {
+    border-color: var(--safelight-bright);
+  }
+  .personalize input#dateInput {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+  }
+  .personalize input::placeholder {
+    color: rgba(156,140,125,0.6);
+  }
+
   /* controls */
   .controls {
     margin-top: 22px;
@@ -386,6 +421,13 @@
   </div>
   <div class="cue" id="cue"></div>
 
+  <div class="personalize">
+    <label for="captionInput">Strip caption</label>
+    <input type="text" id="captionInput" maxlength="40" placeholder="say something memorable...">
+    <label for="dateInput">Date / subtitle</label>
+    <input type="text" id="dateInput" maxlength="30" placeholder="e.g. Sept 07, 2026">
+  </div>
+
   <div class="controls">
     <button class="btn-primary" id="startBtn">Start session</button>
     <div class="row" id="resultRow" style="display:none;">
@@ -450,12 +492,22 @@
   const windowEl = document.getElementById('window');
   const manualSaveRow = document.getElementById('manualSaveRow');
   const manualSaveLink = document.getElementById('manualSaveLink');
+  const captionInput = document.getElementById('captionInput');
+  const dateInput = document.getElementById('dateInput');
+
+  dateInput.value = formatDate();
+  [captionInput, dateInput].forEach(inp => {
+    inp.addEventListener('input', () => {
+      if (captured.length === 3) buildStrip();
+    });
+  });
 
   let currentTemplate = 'mono';
   let stream = null;
   let captured = [];
   let finalCanvas = null;
   let lastBlobUrl = null;
+  let ticketNumber = '100';
 
   // ---- shot status dots ----
   function renderDots(filled) {
@@ -517,6 +569,7 @@
       await countdownAndCapture(i);
     }
     stopCamera();
+    ticketNumber = String(Math.floor(Math.random() * 900) + 100);
     buildStrip();
     showResult();
   }
@@ -597,6 +650,7 @@
     windowEl.classList.remove('result-mode');
     startBtn.style.display = 'none';
     renderDots(3);
+    ticketNumber = String(Math.floor(Math.random() * 900) + 100);
     buildStrip();
     showResult();
   });
@@ -730,12 +784,18 @@
     });
 
     ctx.fillStyle = '#f4f0ea';
-    ctx.font = '600 20px Fraunces, serif';
+    const maxTextW = L.width - 56;
+    const capText = getCaptionText('PHOTO BOOTH');
+    const capSize = fitFontSize(ctx, capText, maxTextW, 22, 13, s => `600 ${s}px Fraunces, serif`);
+    ctx.font = `600 ${capSize}px Fraunces, serif`;
     ctx.textAlign = 'center';
-    ctx.fillText('PHOTO BOOTH', L.width / 2, L.height - 44);
-    ctx.font = '12px "IBM Plex Mono", monospace';
+    ctx.fillText(capText, L.width / 2, L.height - 44);
+
     ctx.fillStyle = '#8a8a8a';
-    ctx.fillText(formatDate(), L.width / 2, L.height - 22);
+    const dateText = getDateText();
+    const dateSize = fitFontSize(ctx, dateText, maxTextW, 12, 9, s => `${s}px "IBM Plex Mono", monospace`);
+    ctx.font = `${dateSize}px "IBM Plex Mono", monospace`;
+    ctx.fillText(dateText, L.width / 2, L.height - 22);
     return c;
   }
 
@@ -763,12 +823,18 @@
     });
 
     ctx.fillStyle = '#1b1512';
-    ctx.font = '600 22px Fraunces, serif';
+    const maxTextW2 = L.width - 56;
+    const capText2 = getCaptionText('Sunroom Booth');
+    const capSize2 = fitFontSize(ctx, capText2, maxTextW2, 24, 13, s => `600 ${s}px Fraunces, serif`);
+    ctx.font = `600 ${capSize2}px Fraunces, serif`;
     ctx.textAlign = 'center';
-    ctx.fillText('Sunroom Booth', L.width / 2, L.height - 44);
-    ctx.font = '12px "IBM Plex Mono", monospace';
+    ctx.fillText(capText2, L.width / 2, L.height - 44);
+
     ctx.fillStyle = '#7a5233';
-    ctx.fillText(formatDate(), L.width / 2, L.height - 22);
+    const dateText2 = getDateText();
+    const dateSize2 = fitFontSize(ctx, dateText2, maxTextW2, 12, 9, s => `${s}px "IBM Plex Mono", monospace`);
+    ctx.font = `${dateSize2}px "IBM Plex Mono", monospace`;
+    ctx.fillText(dateText2, L.width / 2, L.height - 22);
     return c;
   }
 
@@ -795,15 +861,41 @@
       ctx.strokeRect(L.pad - 5, y - 5, L.photoW + 10, L.photoH + 10);
     });
 
-    const ticket = String(Math.floor(Math.random() * 900) + 100);
+    const ticket = ticketNumber;
     ctx.fillStyle = '#efe6d8';
-    ctx.font = '600 20px Fraunces, serif';
+    const maxTextW3 = L.width - 56;
+    const capText3 = getCaptionText('Night Arcade');
+    const capSize3 = fitFontSize(ctx, capText3, maxTextW3, 22, 13, s => `600 ${s}px Fraunces, serif`);
+    ctx.font = `600 ${capSize3}px Fraunces, serif`;
     ctx.textAlign = 'center';
-    ctx.fillText('Night Arcade', L.width / 2, L.height - 44);
-    ctx.font = '12px "IBM Plex Mono", monospace';
+    ctx.fillText(capText3, L.width / 2, L.height - 44);
+
     ctx.fillStyle = '#d98e3b';
-    ctx.fillText(`strip no. ${ticket}  ·  ${formatDate()}`, L.width / 2, L.height - 22);
+    const dateText3 = `strip no. ${ticket}  ·  ${getDateText()}`;
+    const dateSize3 = fitFontSize(ctx, dateText3, maxTextW3, 12, 8, s => `${s}px "IBM Plex Mono", monospace`);
+    ctx.font = `${dateSize3}px "IBM Plex Mono", monospace`;
+    ctx.fillText(dateText3, L.width / 2, L.height - 22);
     return c;
+  }
+
+  function getCaptionText(fallback) {
+    const v = captionInput.value.trim();
+    return v.length ? v : fallback;
+  }
+
+  function getDateText() {
+    const v = dateInput.value.trim();
+    return v.length ? v : formatDate();
+  }
+
+  function fitFontSize(ctx, text, maxWidth, maxSize, minSize, fontBuilder) {
+    let size = maxSize;
+    ctx.font = fontBuilder(size);
+    while (size > minSize && ctx.measureText(text).width > maxWidth) {
+      size -= 1;
+      ctx.font = fontBuilder(size);
+    }
+    return size;
   }
 
   function roundRectPath(ctx, x, y, w, h, r) {
