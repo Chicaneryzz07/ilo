@@ -30,7 +30,22 @@
     background:var(--ink); color:var(--bone);
     font-family:var(--sans); font-weight:400;
     overflow-x:hidden; -webkit-font-smoothing:antialiased;
+    position:relative;
   }
+  body::before{
+    content:''; position:fixed; inset:0; z-index:1; pointer-events:none;
+    background:var(--blush);
+    -webkit-mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    -webkit-mask-size:180px 180px;
+    mask-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    mask-size:180px 180px;
+    opacity:0.22; mix-blend-mode:screen;
+  }
+  body::after{
+    content:''; position:fixed; inset:0; z-index:1; pointer-events:none;
+    background:radial-gradient(120% 100% at 50% 0%, transparent 40%, rgba(0,0,0,0.6) 100%);
+  }
+  nav, footer, section{ position:relative; z-index:2; }
   ::selection{ background:var(--bone); color:var(--ink); }
   a{ color:inherit; text-decoration:none; }
   img{ display:block; max-width:100%; }
@@ -336,7 +351,7 @@
       <div class="prose dropcap">
         <p class="lede">Ilo, or Iloni when I want to sound extra serious, is a whole contradiction wrapped in a black dress and a coffee order she's very particular about. She looks unbothered, a little dangerous even, the kind of girl people notice without knowing why. And then you actually talk to her and realize she's soft in all the places she'd never admit to.</p>
         <p class="body">She doesn't say "I love you" easily. She shows it instead: in the way she remembers small things, in the way she goes quiet when she actually cares, in the way her walls take forever to come down and mean everything once they do.</p>
-        <p class="body">She loves her coffee, her lip gloss collection, her clothes, and the quiet little rituals that are hers alone.</p>
+        <p class="body">She loves her coffee (made exactly her way, never any other way), a good mocktail when the night calls for one, her lip gloss collection, her clothes, and the quiet little rituals that are hers alone.</p>
         <p class="body">She lives far from me, farther than I'd like, and we haven't even met in person yet. But somehow, from this distance, she's still managed to become one of my favorite people.</p>
         <p class="pull">Baddie exterior, soft heart, terrible at saying it out loud, and somehow that's exactly who I fell for.</p>
       </div>
@@ -350,7 +365,7 @@
     <div class="kicker">chapter two · the distance</div>
     <h2>Two points on a map, <em>learning patience.</em></h2>
     <p class="lede">Different clocks. Different weather. The same phone, held at strange hours because it's the only hour we share.</p>
-    <p class="body" style="margin-top:22px;">I wish I could hand you a coffee in person instead of hearing about your order over text. Soon, though. I'm holding onto that.</p>
+    <p class="body" style="margin-top:22px;">I wish I could hand you a coffee, or a mocktail if it's that kind of evening, in person instead of just hearing about it over text. Soon, though. I'm holding onto that.</p>
 
     <div class="distance-wrap">
       <svg class="distance-svg" viewBox="0 0 1000 220" preserveAspectRatio="xMidYMid meet" id="distanceSvg">
@@ -385,7 +400,7 @@
       <div class="letter-card">
         <span class="letter-date">a rainy friday, thinking of you</span>
         <div class="letter-sal">To the girl with the soft heart,</div>
-        <p class="letter-body">Everyone sees the confidence: the fits, the gloss, the "I don't need anyone" energy. I see that too. But I also see the version of you that gets shy when someone's actually kind to you, and honestly, that's the version I fell for.<br><br>I wish I could hand you a coffee in person instead of just hearing about your order over text. Soon, though. I'm holding onto that.</p>
+        <p class="letter-body">Everyone sees the confidence: the fits, the gloss, the "I don't need anyone" energy. I see that too. But I also see the version of you that gets shy when someone's actually kind to you, and honestly, that's the version I fell for.<br><br>I wish I could hand you a coffee, or a mocktail if it's that kind of evening, in person instead of just hearing about it over text. Soon, though. I'm holding onto that.</p>
         <div class="letter-sig"><span class="dot-accent">·</span> Mike, who notices you</div>
       </div>
     </div>
@@ -420,7 +435,7 @@
     <div class="quotelist">
       <div class="qrow"><p class="qtext">"She looks like she doesn't need anyone. She is, secretly, one of the softest people I know."</p><p class="qauthor">on the girl behind the black dress</p></div>
       <div class="qrow"><p class="qtext">"She doesn't say 'I love you.' She remembers what you told her three weeks ago and brings it up like it mattered. It did."</p><p class="qauthor">on the way she loves quietly</p></div>
-      <div class="qrow"><p class="qtext">"A good coffee, the right gloss, an outfit that feels like armor: she knows exactly who she is, even when she won't say what she feels."</p><p class="qauthor">on her little rituals</p></div>
+      <div class="qrow"><p class="qtext">"A good coffee, a good mocktail, the right gloss, an outfit that feels like armor: she knows exactly who she is, even when she won't say what she feels."</p><p class="qauthor">on her little rituals</p></div>
       <div class="qrow"><p class="qtext">"Distance is just a rude, temporary inconvenience. I already know I'd choose her in a room full of people I could actually touch."</p><p class="qauthor">on missing her from here</p></div>
       <div class="qrow"><p class="qtext">"To love her is to be patient with her walls, and grateful for every inch she lets down."</p><p class="qauthor">the whole point of this page</p></div>
     </div>
@@ -489,7 +504,7 @@
     <div class="kicker" style="text-align:center">a quiet invitation</div>
     <h2>Before you close <em>this page.</em></h2>
     <p class="lede">If somewhere in all this you smiled, even a little, then let this be the start of something, not the end of it. We haven't met yet, but I'd really like to fix that.</p>
-    <div class="contact">Call me. Text me. WhatsApp me.<br>7005106501<br>I'll be waiting on the other side, counting down the miles.</div>
+    <div class="contact">Call me. Text me. WhatsApp me. I still owe you that coffee, and a mocktail after.<br>7005106501<br>I'll be waiting on the other side, counting down the miles.</div>
     <a href="tel:7005106501" class="btn">Reach me</a>
   </div>
 </section>

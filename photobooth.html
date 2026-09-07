@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Photo Booth</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-void: #14100d;
+    --bg-curtain: #241a16;
+    --bg-curtain-2: #1c1411;
+    --safelight: #c1392b;
+    --safelight-bright: #e2503f;
+    --paper: #efe6d8;
+    --amber: #d98e3b;
+    --ink: #1b1512;
+    --muted: #9c8c7d;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    background: var(--bg-void);
+    color: var(--paper);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  body {
+    background-image: repeating-linear-gradient(
+      100deg,
+      var(--bg-curtain) 0px,
+      var(--bg-curtain) 38px,
+      var(--bg-curtain-2) 38px,
+      var(--bg-curtain-2) 74px
+    );
+    display: flex;
+    justify-content: center;
+    padding: 48px 20px 80px;
+  }
+
+  .stage {
+    width: 100%;
+    max-width: 460px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 34px;
+  }
+
+  header .kicker {
+    display: block;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-size: 44px;
+    line-height: 1;
+    margin: 0 0 12px;
+    color: var(--paper);
+  }
+
+  header p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13.5px;
+    line-height: 1.6;
+    max-width: 320px;
+    margin: 0 auto;
+  }
+
+  /* booth window */
+  .booth {
+    position: relative;
+    background: var(--ink);
+    border-radius: 18px 18px 10px 10px;
+    padding: 14px;
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.04),
+      0 30px 60px -20px rgba(0,0,0,0.7);
+  }
+
+  .booth::before {
+    content: "";
+    position: absolute;
+    inset: -3px;
+    border-radius: 20px 20px 12px 12px;
+    padding: 3px;
+    background: linear-gradient(160deg, var(--safelight-bright), transparent 60%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.55;
+    pointer-events: none;
+  }
+
+  .window {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    background: #0a0807;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .window video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scaleX(-1);
+    display: none;
+  }
+
+  .window canvas.strip-preview {
+    max-width: 100%;
+    max-height: 100%;
+    display: none;
+    border-radius: 4px;
+  }
+
+  .placeholder {
+    color: var(--muted);
+    font-size: 12.5px;
+    text-align: center;
+    padding: 0 30px;
+    letter-spacing: 0.02em;
+  }
+
+  .placeholder .lens {
+    width: 46px;
+    height: 46px;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    border: 2px solid var(--muted);
+    position: relative;
+  }
+  .placeholder .lens::after {
+    content: "";
+    position: absolute;
+    inset: 10px;
+    border-radius: 50%;
+    background: var(--muted);
+    opacity: 0.4;
+  }
+
+  .countdown {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-size: 96px;
+    font-weight: 600;
+    color: var(--paper);
+    text-shadow: 0 0 40px rgba(226,80,63,0.8);
+    background: rgba(10,8,7,0.15);
+  }
+
+  .flash {
+    position: absolute;
+    inset: 0;
+    background: white;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .flash.go {
+    animation: flashpop 380ms ease-out;
+  }
+  @keyframes flashpop {
+    0% { opacity: 0.9; }
+    100% { opacity: 0; }
+  }
+
+  .shot-status {
+    position: absolute;
+    left: 12px;
+    bottom: 12px;
+    display: flex;
+    gap: 6px;
+  }
+  .shot-status .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.25);
+    transition: background 200ms ease;
+  }
+  .shot-status .dot.filled {
+    background: var(--safelight-bright);
+  }
+
+  .cue {
+    text-align: center;
+    font-size: 12.5px;
+    color: var(--muted);
+    margin-top: 14px;
+    min-height: 16px;
+  }
+
+  /* controls */
+  .controls {
+    margin-top: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  button {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13.5px;
+    letter-spacing: 0.02em;
+    border: none;
+    border-radius: 8px;
+    padding: 14px 18px;
+    cursor: pointer;
+    transition: transform 120ms ease, opacity 120ms ease;
+  }
+  button:active { transform: scale(0.98); }
+  button:disabled { opacity: 0.4; cursor: default; }
+
+  .btn-primary {
+    background: var(--safelight-bright);
+    color: #1b0806;
+    font-weight: 600;
+  }
+  .btn-primary:hover:not(:disabled) { background: #ef6353; }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--paper);
+    border: 1px solid rgba(239,230,216,0.25);
+  }
+  .btn-secondary:hover:not(:disabled) { border-color: rgba(239,230,216,0.5); }
+
+  .row {
+    display: flex;
+    gap: 10px;
+  }
+  .row button { flex: 1; }
+
+  .upload-fallback {
+    text-align: center;
+    margin-top: 14px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .upload-fallback a {
+    color: var(--amber);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+  .upload-fallback input { display: none; }
+
+  /* template picker */
+  .templates {
+    margin-top: 30px;
+  }
+  .templates h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 18px;
+    margin: 0 0 4px;
+    color: var(--paper);
+  }
+  .templates .sub {
+    font-size: 12px;
+    color: var(--muted);
+    margin: 0 0 14px;
+  }
+
+  .swatches {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+  }
+
+  .swatch {
+    cursor: pointer;
+    border-radius: 10px;
+    padding: 10px 8px 12px;
+    border: 1.5px solid rgba(239,230,216,0.12);
+    background: rgba(0,0,0,0.15);
+    text-align: center;
+    transition: border-color 150ms ease, background 150ms ease;
+  }
+  .swatch.active {
+    border-color: var(--safelight-bright);
+    background: rgba(226,80,63,0.08);
+  }
+
+  .swatch-strip {
+    width: 100%;
+    aspect-ratio: 3 / 5;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px;
+  }
+  .swatch-strip .frame {
+    flex: 1;
+    border-radius: 2px;
+  }
+
+  .swatch-mono { background: #0b0b0b; }
+  .swatch-mono .frame { background: linear-gradient(135deg,#555,#222); border: 1px solid #fff; }
+
+  .swatch-sepia { background: var(--paper); }
+  .swatch-sepia .frame { background: linear-gradient(135deg,#c9a06a,#7a5233); border-radius: 3px; }
+
+  .swatch-night { background: #1a0f0d; }
+  .swatch-night .frame { background: linear-gradient(135deg,#3a2a20,#151010); border: 1px solid var(--amber); }
+
+  .swatch span {
+    font-size: 11px;
+    color: var(--paper);
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <header>
+    <span class="kicker">three shots, one strip</span>
+    <h1>Photo Booth</h1>
+    <p>Pick a strip below, step into the window, and strike three poses. We'll print them together when you're done.</p>
+  </header>
+
+  <div class="booth">
+    <div class="window" id="window">
+      <div class="placeholder" id="placeholder">
+        <div class="lens"></div>
+        Camera's off. Choose a strip, then start your session.
+      </div>
+      <video id="video" playsinline autoplay muted></video>
+      <canvas class="strip-preview" id="stripPreview"></canvas>
+      <div class="countdown" id="countdown"></div>
+      <div class="flash" id="flash"></div>
+      <div class="shot-status" id="shotStatus"></div>
+    </div>
+  </div>
+  <div class="cue" id="cue"></div>
+
+  <div class="controls">
+    <button class="btn-primary" id="startBtn">Start session</button>
+    <div class="row" id="resultRow" style="display:none;">
+      <button class="btn-secondary" id="retakeBtn">Retake</button>
+      <button class="btn-primary" id="saveBtn">Save strip</button>
+    </div>
+  </div>
+
+  <div class="upload-fallback" id="uploadFallback">
+    No camera handy? <a id="uploadLink">Upload 3 photos instead</a>
+    <input type="file" id="fileInput" accept="image/*" multiple>
+  </div>
+
+  <div class="templates" id="templates">
+    <h2>Choose your strip</h2>
+    <p class="sub">You can still switch this after your session.</p>
+    <div class="swatches">
+      <div class="swatch active" data-template="mono">
+        <div class="swatch-strip swatch-mono">
+          <div class="frame"></div><div class="frame"></div><div class="frame"></div>
+        </div>
+        <span>Classic Mono</span>
+      </div>
+      <div class="swatch" data-template="sepia">
+        <div class="swatch-strip swatch-sepia">
+          <div class="frame"></div><div class="frame"></div><div class="frame"></div>
+        </div>
+        <span>Sunroom Sepia</span>
+      </div>
+      <div class="swatch" data-template="night">
+        <div class="swatch-strip swatch-night">
+          <div class="frame"></div><div class="frame"></div><div class="frame"></div>
+        </div>
+        <span>Night Arcade</span>
+      </div>
+    </div>
+  </div>
+
+  <footer>Everything happens in your browser — nothing is uploaded anywhere.<br>Camera access needs a secure page (https or localhost).</footer>
+</div>
+
+<script>
+(function() {
+  const video = document.getElementById('video');
+  const placeholder = document.getElementById('placeholder');
+  const stripPreview = document.getElementById('stripPreview');
+  const countdownEl = document.getElementById('countdown');
+  const flashEl = document.getElementById('flash');
+  const shotStatusEl = document.getElementById('shotStatus');
+  const cueEl = document.getElementById('cue');
+  const startBtn = document.getElementById('startBtn');
+  const retakeBtn = document.getElementById('retakeBtn');
+  const saveBtn = document.getElementById('saveBtn');
+  const resultRow = document.getElementById('resultRow');
+  const templatesEl = document.getElementById('templates');
+  const uploadFallback = document.getElementById('uploadFallback');
+  const uploadLink = document.getElementById('uploadLink');
+  const fileInput = document.getElementById('fileInput');
+
+  let currentTemplate = 'mono';
+  let stream = null;
+  let captured = [];
+  let finalCanvas = null;
+
+  // ---- shot status dots ----
+  function renderDots(filled) {
+    shotStatusEl.innerHTML = '';
+    for (let i = 0; i < 3; i++) {
+      const d = document.createElement('div');
+      d.className = 'dot' + (i < filled ? ' filled' : '');
+      shotStatusEl.appendChild(d);
+    }
+  }
+
+  // ---- template selection ----
+  templatesEl.addEventListener('click', (e) => {
+    const swatch = e.target.closest('.swatch');
+    if (!swatch) return;
+    document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+    swatch.classList.add('active');
+    currentTemplate = swatch.dataset.template;
+    if (captured.length === 3) {
+      buildStrip();
+    }
+  });
+
+  // ---- session flow ----
+  startBtn.addEventListener('click', startSession);
+
+  async function startSession() {
+    captured = [];
+    finalCanvas = null;
+    resultRow.style.display = 'none';
+    stripPreview.style.display = 'none';
+    startBtn.disabled = true;
+    cueEl.textContent = 'Asking for camera access...';
+
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+    } catch (err) {
+      cueEl.textContent = 'Camera unavailable — you can upload photos instead.';
+      startBtn.disabled = false;
+      return;
+    }
+
+    placeholder.style.display = 'none';
+    video.srcObject = stream;
+    video.style.display = 'block';
+    renderDots(0);
+    startBtn.style.display = 'none';
+
+    await runShotSequence();
+  }
+
+  async function runShotSequence() {
+    for (let i = 0; i < 3; i++) {
+      cueEl.textContent = i === 0 ? 'Get ready...' : 'Nice! Next pose...';
+      await wait(i === 0 ? 900 : 1100);
+      await countdownAndCapture(i);
+    }
+    stopCamera();
+    buildStrip();
+    showResult();
+  }
+
+  function wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  async function countdownAndCapture(index) {
+    countdownEl.style.display = 'flex';
+    for (let n = 3; n >= 1; n--) {
+      countdownEl.textContent = n;
+      await wait(700);
+    }
+    countdownEl.style.display = 'none';
+    flashEl.classList.remove('go');
+    void flashEl.offsetWidth; // restart animation
+    flashEl.classList.add('go');
+
+    const frame = captureFrame();
+    captured.push(frame);
+    renderDots(captured.length);
+    cueEl.textContent = `Shot ${index + 1} of 3 captured.`;
+    await wait(250);
+  }
+
+  function captureFrame() {
+    // crop the live video to a 4:3 box, matching the mirrored preview
+    const targetW = 520, targetH = 390;
+    const c = document.createElement('canvas');
+    c.width = targetW;
+    c.height = targetH;
+    const ctx = c.getContext('2d');
+
+    const vw = video.videoWidth, vh = video.videoHeight;
+    const targetRatio = targetW / targetH;
+    const srcRatio = vw / vh;
+    let sx, sy, sw, sh;
+    if (srcRatio > targetRatio) {
+      sh = vh;
+      sw = vh * targetRatio;
+      sx = (vw - sw) / 2;
+      sy = 0;
+    } else {
+      sw = vw;
+      sh = vw / targetRatio;
+      sx = 0;
+      sy = (vh - sh) / 2;
+    }
+
+    ctx.translate(targetW, 0);
+    ctx.scale(-1, 1);
+    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, targetW, targetH);
+    return c;
+  }
+
+  function stopCamera() {
+    if (stream) {
+      stream.getTracks().forEach(t => t.stop());
+      stream = null;
+    }
+    video.style.display = 'none';
+  }
+
+  // ---- fallback: manual upload ----
+  uploadLink.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', async (e) => {
+    const files = Array.from(e.target.files).slice(0, 3);
+    if (files.length < 3) {
+      cueEl.textContent = 'Please choose 3 photos.';
+      return;
+    }
+    captured = [];
+    for (const file of files) {
+      const img = await loadImageFromFile(file);
+      const c = cropImageToCanvas(img, 520, 390);
+      captured.push(c);
+    }
+    placeholder.style.display = 'none';
+    startBtn.style.display = 'none';
+    renderDots(3);
+    buildStrip();
+    showResult();
+  });
+
+  function loadImageFromFile(file) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.src = URL.createObjectURL(file);
+    });
+  }
+
+  function cropImageToCanvas(img, targetW, targetH) {
+    const c = document.createElement('canvas');
+    c.width = targetW; c.height = targetH;
+    const ctx = c.getContext('2d');
+    const targetRatio = targetW / targetH;
+    const srcRatio = img.width / img.height;
+    let sx, sy, sw, sh;
+    if (srcRatio > targetRatio) {
+      sh = img.height; sw = img.height * targetRatio;
+      sx = (img.width - sw) / 2; sy = 0;
+    } else {
+      sw = img.width; sh = img.width / targetRatio;
+      sx = 0; sy = (img.height - sh) / 2;
+    }
+    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, targetW, targetH);
+    return c;
+  }
+
+  function showResult() {
+    stripPreview.style.display = 'block';
+    resultRow.style.display = 'flex';
+    startBtn.style.display = 'block';
+    startBtn.textContent = 'Start new session';
+    startBtn.disabled = false;
+    cueEl.textContent = 'Strip ready. Save it or try another take.';
+  }
+
+  retakeBtn.addEventListener('click', startSession);
+  saveBtn.addEventListener('click', () => {
+    if (!finalCanvas) return;
+    const link = document.createElement('a');
+    const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+    link.download = `photobooth-strip-${stamp}.png`;
+    link.href = finalCanvas.toDataURL('image/png');
+    link.click();
+  });
+
+  // ---- strip templates ----
+  function buildStrip() {
+    if (captured.length < 3) return;
+    const builders = { mono: buildMono, sepia: buildSepia, night: buildNight };
+    finalCanvas = builders[currentTemplate](captured);
+
+    const pctx = stripPreview.getContext('2d');
+    stripPreview.width = finalCanvas.width;
+    stripPreview.height = finalCanvas.height;
+    pctx.drawImage(finalCanvas, 0, 0);
+  }
+
+  function baseLayout() {
+    const photoW = 420, photoH = 315, gap = 22, pad = 34, footerH = 90;
+    const width = photoW + pad * 2;
+    const height = pad + photoH * 3 + gap * 2 + footerH;
+    return { photoW, photoH, gap, pad, footerH, width, height };
+  }
+
+  function buildMono(shots) {
+    const L = baseLayout();
+    const c = document.createElement('canvas');
+    c.width = L.width; c.height = L.height;
+    const ctx = c.getContext('2d');
+
+    ctx.fillStyle = '#0b0b0b';
+    ctx.fillRect(0, 0, L.width, L.height);
+
+    shots.forEach((shot, i) => {
+      const y = L.pad + i * (L.photoH + L.gap);
+      ctx.save();
+      ctx.filter = 'grayscale(1) contrast(1.08)';
+      ctx.drawImage(shot, L.pad, y, L.photoW, L.photoH);
+      ctx.restore();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 3;
+      ctx.strokeRect(L.pad + 1.5, y + 1.5, L.photoW - 3, L.photoH - 3);
+    });
+
+    ctx.fillStyle = '#f4f0ea';
+    ctx.font = '600 20px Fraunces, serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('PHOTO BOOTH', L.width / 2, L.height - 44);
+    ctx.font = '12px "IBM Plex Mono", monospace';
+    ctx.fillStyle = '#8a8a8a';
+    ctx.fillText(formatDate(), L.width / 2, L.height - 22);
+    return c;
+  }
+
+  function buildSepia(shots) {
+    const L = baseLayout();
+    const c = document.createElement('canvas');
+    c.width = L.width; c.height = L.height;
+    const ctx = c.getContext('2d');
+
+    ctx.fillStyle = '#efe6d8';
+    ctx.fillRect(0, 0, L.width, L.height);
+
+    shots.forEach((shot, i) => {
+      const y = L.pad + i * (L.photoH + L.gap);
+      roundRectPath(ctx, L.pad, y, L.photoW, L.photoH, 10);
+      ctx.save();
+      ctx.clip();
+      ctx.filter = 'sepia(0.55) saturate(1.2) brightness(1.05) contrast(0.96)';
+      ctx.drawImage(shot, L.pad, y, L.photoW, L.photoH);
+      ctx.restore();
+      ctx.strokeStyle = 'rgba(27,21,18,0.35)';
+      ctx.lineWidth = 1.5;
+      roundRectPath(ctx, L.pad, y, L.photoW, L.photoH, 10);
+      ctx.stroke();
+    });
+
+    ctx.fillStyle = '#1b1512';
+    ctx.font = '600 22px Fraunces, serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Sunroom Booth', L.width / 2, L.height - 44);
+    ctx.font = '12px "IBM Plex Mono", monospace';
+    ctx.fillStyle = '#7a5233';
+    ctx.fillText(formatDate(), L.width / 2, L.height - 22);
+    return c;
+  }
+
+  function buildNight(shots) {
+    const L = baseLayout();
+    const c = document.createElement('canvas');
+    c.width = L.width; c.height = L.height;
+    const ctx = c.getContext('2d');
+
+    const grad = ctx.createLinearGradient(0, 0, 0, L.height);
+    grad.addColorStop(0, '#241a16');
+    grad.addColorStop(1, '#120c0a');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, L.width, L.height);
+
+    shots.forEach((shot, i) => {
+      const y = L.pad + i * (L.photoH + L.gap);
+      ctx.drawImage(shot, L.pad, y, L.photoW, L.photoH);
+      ctx.strokeStyle = '#d98e3b';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(L.pad, y, L.photoW, L.photoH);
+      ctx.strokeStyle = 'rgba(217,142,59,0.35)';
+      ctx.lineWidth = 6;
+      ctx.strokeRect(L.pad - 5, y - 5, L.photoW + 10, L.photoH + 10);
+    });
+
+    const ticket = String(Math.floor(Math.random() * 900) + 100);
+    ctx.fillStyle = '#efe6d8';
+    ctx.font = '600 20px Fraunces, serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Night Arcade', L.width / 2, L.height - 44);
+    ctx.font = '12px "IBM Plex Mono", monospace';
+    ctx.fillStyle = '#d98e3b';
+    ctx.fillText(`strip no. ${ticket}  ·  ${formatDate()}`, L.width / 2, L.height - 22);
+    return c;
+  }
+
+  function roundRectPath(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function formatDate() {
+    const d = new Date();
+    return d.toLocaleDateString(undefined, { month: 'short', day: '2-digit', year: 'numeric' });
+  }
+})();
+</script>
+</body>
+</html>
