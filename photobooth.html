@@ -132,6 +132,26 @@
     border-radius: 4px;
   }
 
+  /* once a strip is generated, the window switches to a scrollable
+     natural-height frame so the full (tall) strip is reachable on mobile */
+  .window.result-mode {
+    aspect-ratio: auto;
+    height: auto;
+    max-height: 74vh;
+    overflow-y: auto;
+    display: block;
+    padding: 14px 0;
+    -webkit-overflow-scrolling: touch;
+  }
+  .window.result-mode canvas.strip-preview {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    max-height: none;
+    margin: 0 auto;
+  }
+
   .placeholder {
     color: var(--muted);
     font-size: 12.5px;
@@ -373,6 +393,9 @@
       <button class="btn-primary" id="saveBtn">Save strip</button>
     </div>
   </div>
+  <div class="upload-fallback" id="manualSaveRow" style="display:none;">
+    Save button not working? <a id="manualSaveLink">Open the strip in a new tab</a> and press and hold it to save.
+  </div>
 
   <div class="upload-fallback" id="uploadFallback">
     No camera handy? <a id="uploadLink">Upload 3 photos instead</a>
@@ -424,11 +447,15 @@
   const uploadFallback = document.getElementById('uploadFallback');
   const uploadLink = document.getElementById('uploadLink');
   const fileInput = document.getElementById('fileInput');
+  const windowEl = document.getElementById('window');
+  const manualSaveRow = document.getElementById('manualSaveRow');
+  const manualSaveLink = document.getElementById('manualSaveLink');
 
   let currentTemplate = 'mono';
   let stream = null;
   let captured = [];
   let finalCanvas = null;
+  let lastBlobUrl = null;
 
   // ---- shot status dots ----
   function renderDots(filled) {
@@ -459,7 +486,10 @@
     captured = [];
     finalCanvas = null;
     resultRow.style.display = 'none';
+    manualSaveRow.style.display = 'none';
     stripPreview.style.display = 'none';
+    windowEl.classList.remove('result-mode');
+    if (lastBlobUrl) { URL.revokeObjectURL(lastBlobUrl); lastBlobUrl = null; }
     startBtn.disabled = true;
     cueEl.textContent = 'Asking for camera access...';
 
@@ -564,6 +594,7 @@
       captured.push(c);
     }
     placeholder.style.display = 'none';
+    windowEl.classList.remove('result-mode');
     startBtn.style.display = 'none';
     renderDots(3);
     buildStrip();
@@ -598,21 +629,65 @@
 
   function showResult() {
     stripPreview.style.display = 'block';
+    windowEl.classList.add('result-mode');
+    windowEl.scrollTop = 0;
     resultRow.style.display = 'flex';
+    manualSaveRow.style.display = 'block';
     startBtn.style.display = 'block';
     startBtn.textContent = 'Start new session';
     startBtn.disabled = false;
-    cueEl.textContent = 'Strip ready. Save it or try another take.';
+    cueEl.textContent = 'Strip ready. Scroll to see it all, then save.';
   }
 
   retakeBtn.addEventListener('click', startSession);
-  saveBtn.addEventListener('click', () => {
-    if (!finalCanvas) return;
-    const link = document.createElement('a');
+
+  function filename() {
     const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-    link.download = `photobooth-strip-${stamp}.png`;
-    link.href = finalCanvas.toDataURL('image/png');
-    link.click();
+    return `photobooth-strip-${stamp}.png`;
+  }
+
+  saveBtn.addEventListener('click', async () => {
+    if (!finalCanvas) return;
+    const name = filename();
+
+    finalCanvas.toBlob(async (blob) => {
+      if (!blob) return;
+
+      // Mobile browsers (iOS Safari, many Android browsers) ignore the
+      // <a download> attribute entirely, so try the Web Share API first —
+      // it hands the PNG to the native "Save Image" / share sheet.
+      const file = new File([blob], name, { type: 'image/png' });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file], title: 'Photo Booth Strip' });
+          return;
+        } catch (err) {
+          if (err && err.name === 'AbortError') return; // user cancelled the share sheet
+          // fall through to the download fallback below
+        }
+      }
+
+      // Desktop / browsers without file-sharing support: normal download link.
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.download = name;
+      link.href = url;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+    }, 'image/png');
+  });
+
+  manualSaveLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    if (!finalCanvas) return;
+    finalCanvas.toBlob((blob) => {
+      if (!blob) return;
+      if (lastBlobUrl) URL.revokeObjectURL(lastBlobUrl);
+      lastBlobUrl = URL.createObjectURL(blob);
+      window.open(lastBlobUrl, '_blank');
+    }, 'image/png');
   });
 
   // ---- strip templates ----
