@@ -556,6 +556,7 @@
     placeholder.style.display = 'none';
     video.srcObject = stream;
     video.style.display = 'block';
+    shotStatusEl.style.display = 'flex';
     renderDots(0);
     startBtn.style.display = 'none';
 
@@ -683,6 +684,7 @@
 
   function showResult() {
     stripPreview.style.display = 'block';
+    shotStatusEl.style.display = 'none';
     windowEl.classList.add('result-mode');
     windowEl.scrollTop = 0;
     resultRow.style.display = 'flex';
