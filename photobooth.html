@@ -18,6 +18,8 @@
     --amber: #d98e3b;
     --ink: #1b1512;
     --muted: #9c8c7d;
+    --blush: #f6a6c1;
+    --blush-deep: #d6336c;
   }
 
   * { box-sizing: border-box; }
@@ -79,6 +81,60 @@
     line-height: 1.6;
     max-width: 320px;
     margin: 0 auto;
+  }
+
+  /* how-it-works instructions */
+  .howto {
+    background: rgba(0,0,0,0.18);
+    border: 1px solid rgba(239,230,216,0.1);
+    border-radius: 12px;
+    padding: 18px 20px 16px;
+    margin-bottom: 30px;
+  }
+  .howto h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 16px;
+    margin: 0 0 12px;
+    color: var(--paper);
+  }
+  .howto ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+  .howto li {
+    counter-increment: step;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: var(--muted);
+    padding-left: 26px;
+    position: relative;
+  }
+  .howto li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0;
+    top: -1px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--safelight-bright);
+    color: #1b0806;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .howto li strong {
+    color: var(--paper);
+    font-weight: 600;
   }
 
   /* booth window */
@@ -341,7 +397,7 @@
 
   .swatches {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(2, 1fr);
     gap: 12px;
   }
 
@@ -383,6 +439,9 @@
   .swatch-night { background: #1a0f0d; }
   .swatch-night .frame { background: linear-gradient(135deg,#3a2a20,#151010); border: 1px solid var(--amber); }
 
+  .swatch-blush { background: linear-gradient(160deg,#ffeef5,#ffd6e8); }
+  .swatch-blush .frame { background: #fff; border: 1px solid var(--blush-deep); border-radius: 5px; }
+
   .swatch span {
     font-size: 11px;
     color: var(--paper);
@@ -405,6 +464,17 @@
     <h1>Photo Booth</h1>
     <p>Pick a strip below, step into the window, and strike three poses. We'll print them together when you're done.</p>
   </header>
+
+  <div class="howto">
+    <h2>How it works</h2>
+    <ol>
+      <li>Pick a strip style below, and type in a caption or date if you want one — both are optional.</li>
+      <li>Press <strong>Start session</strong> and allow camera access when your browser asks.</li>
+      <li>Strike a pose for each 3-2-1 countdown — three shots total, with a flash to confirm each one.</li>
+      <li>Your strip builds itself automatically. Scroll the window to see the whole thing.</li>
+      <li>Press <strong>Save strip</strong> to download it straight to your device.</li>
+    </ol>
+  </div>
 
   <div class="booth">
     <div class="window" id="window">
@@ -466,10 +536,16 @@
         </div>
         <span>Night Arcade</span>
       </div>
+      <div class="swatch" data-template="blush">
+        <div class="swatch-strip swatch-blush">
+          <div class="frame"></div><div class="frame"></div><div class="frame"></div>
+        </div>
+        <span>Blush Pop</span>
+      </div>
     </div>
   </div>
 
-  <footer>Everything happens in your browser — nothing is uploaded anywhere.<br>Camera access needs a secure page (https or localhost).</footer>
+  <footer>Camera access needs a secure page (https or localhost).</footer>
 </div>
 
 <script>
@@ -513,8 +589,12 @@
     return fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
       method: 'POST',
       body: form
-    }).then(res => {
-      if (!res.ok) throw new Error('Cloudinary upload failed: ' + res.status);
+    }).then(async res => {
+      if (!res.ok) {
+        let detail = '';
+        try { detail = (await res.json()).error?.message || ''; } catch (e) { /* body wasn't JSON */ }
+        throw new Error(`Cloudinary upload failed: ${res.status} ${detail}`);
+      }
       return res.json();
     });
   }
@@ -570,7 +650,10 @@
     cueEl.textContent = 'Asking for camera access...';
 
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 1920 }, height: { ideal: 1440 } },
+        audio: false
+      });
     } catch (err) {
       cueEl.textContent = 'Camera unavailable — you can upload photos instead.';
       startBtn.disabled = false;
@@ -620,12 +703,16 @@
   }
 
   function captureFrame() {
-    // crop the live video to a 4:3 box, matching the mirrored preview
-    const targetW = 520, targetH = 390;
+    // crop the live video to a 4:3 box, matching the mirrored preview.
+    // captured well above the strip's print size so photos stay sharp
+    // even after the template compositing scales them down.
+    const targetW = 1000, targetH = 750;
     const c = document.createElement('canvas');
     c.width = targetW;
     c.height = targetH;
     const ctx = c.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
 
     const vw = video.videoWidth, vh = video.videoHeight;
     const targetRatio = targetW / targetH;
@@ -668,7 +755,7 @@
     captured = [];
     for (const file of files) {
       const img = await loadImageFromFile(file);
-      const c = cropImageToCanvas(img, 520, 390);
+      const c = cropImageToCanvas(img, 1000, 750);
       captured.push(c);
     }
     placeholder.style.display = 'none';
@@ -692,6 +779,8 @@
     const c = document.createElement('canvas');
     c.width = targetW; c.height = targetH;
     const ctx = c.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
     const targetRatio = targetW / targetH;
     const srcRatio = img.width / img.height;
     let sx, sy, sw, sh;
@@ -723,7 +812,7 @@
 
   function filename() {
     const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-    return `photobooth-strip-${stamp}.png`;
+    return `photobooth-strip-${stamp}.jpg`;
   }
 
   saveBtn.addEventListener('click', async () => {
@@ -740,7 +829,7 @@
       // Chrome/Edge on Windows also report canShare(true) for files, which
       // hijacks a plain "save to disk" click into an OS share popup.
       if (isMobileDevice() && navigator.canShare) {
-        const file = new File([blob], name, { type: 'image/png' });
+        const file = new File([blob], name, { type: 'image/jpeg' });
         if (navigator.canShare({ files: [file] })) {
           try {
             await navigator.share({ files: [file], title: 'Photo Booth Strip' });
@@ -763,7 +852,7 @@
       document.body.removeChild(link);
       setTimeout(() => URL.revokeObjectURL(url), 4000);
       cueEl.textContent = 'Saved.';
-    }, 'image/png');
+    }, 'image/jpeg', 0.92);
   });
 
   manualSaveLink.addEventListener('click', (e) => {
@@ -774,33 +863,46 @@
       if (lastBlobUrl) URL.revokeObjectURL(lastBlobUrl);
       lastBlobUrl = URL.createObjectURL(blob);
       window.open(lastBlobUrl, '_blank');
-    }, 'image/png');
+    }, 'image/jpeg', 0.92);
   });
 
   // ---- strip templates ----
   function buildStrip() {
     if (captured.length < 3) return;
-    const builders = { mono: buildMono, sepia: buildSepia, night: buildNight };
+    const builders = { mono: buildMono, sepia: buildSepia, night: buildNight, blush: buildBlush };
     finalCanvas = builders[currentTemplate](captured);
 
     const pctx = stripPreview.getContext('2d');
+    pctx.imageSmoothingEnabled = true;
+    pctx.imageSmoothingQuality = 'high';
     stripPreview.width = finalCanvas.width;
     stripPreview.height = finalCanvas.height;
     pctx.drawImage(finalCanvas, 0, 0);
   }
 
   function baseLayout() {
-    const photoW = 420, photoH = 315, gap = 22, pad = 34, footerH = 90;
+    // SCALE bumps the print resolution well above the old 420px-wide strip,
+    // which was the real source of the "blurry" look — the photos themselves
+    // were fine, the canvas they were composited onto was just too small.
+    const SCALE = 1.6;
+    const photoW = Math.round(420 * SCALE);
+    const photoH = Math.round(315 * SCALE);
+    const gap = Math.round(22 * SCALE);
+    const pad = Math.round(34 * SCALE);
+    const footerH = Math.round(90 * SCALE);
     const width = photoW + pad * 2;
     const height = pad + photoH * 3 + gap * 2 + footerH;
-    return { photoW, photoH, gap, pad, footerH, width, height };
+    return { photoW, photoH, gap, pad, footerH, width, height, scale: SCALE };
   }
 
   function buildMono(shots) {
     const L = baseLayout();
+    const S = L.scale;
     const c = document.createElement('canvas');
     c.width = L.width; c.height = L.height;
     const ctx = c.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
 
     ctx.fillStyle = '#0b0b0b';
     ctx.fillRect(0, 0, L.width, L.height);
@@ -812,70 +914,76 @@
       ctx.drawImage(shot, L.pad, y, L.photoW, L.photoH);
       ctx.restore();
       ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 3;
-      ctx.strokeRect(L.pad + 1.5, y + 1.5, L.photoW - 3, L.photoH - 3);
+      ctx.lineWidth = 3 * S;
+      ctx.strokeRect(L.pad + 1.5 * S, y + 1.5 * S, L.photoW - 3 * S, L.photoH - 3 * S);
     });
 
     ctx.fillStyle = '#f4f0ea';
-    const maxTextW = L.width - 56;
+    const maxTextW = L.width - 56 * S;
     const capText = getCaptionText('PHOTO BOOTH');
-    const capSize = fitFontSize(ctx, capText, maxTextW, 22, 13, s => `600 ${s}px Fraunces, serif`);
+    const capSize = fitFontSize(ctx, capText, maxTextW, 22 * S, 13 * S, s => `600 ${s}px Fraunces, serif`);
     ctx.font = `600 ${capSize}px Fraunces, serif`;
     ctx.textAlign = 'center';
-    ctx.fillText(capText, L.width / 2, L.height - 44);
+    ctx.fillText(capText, L.width / 2, L.height - 44 * S);
 
     ctx.fillStyle = '#8a8a8a';
     const dateText = getDateText();
-    const dateSize = fitFontSize(ctx, dateText, maxTextW, 12, 9, s => `${s}px "IBM Plex Mono", monospace`);
+    const dateSize = fitFontSize(ctx, dateText, maxTextW, 12 * S, 9 * S, s => `${s}px "IBM Plex Mono", monospace`);
     ctx.font = `${dateSize}px "IBM Plex Mono", monospace`;
-    ctx.fillText(dateText, L.width / 2, L.height - 22);
+    ctx.fillText(dateText, L.width / 2, L.height - 22 * S);
     return c;
   }
 
   function buildSepia(shots) {
     const L = baseLayout();
+    const S = L.scale;
     const c = document.createElement('canvas');
     c.width = L.width; c.height = L.height;
     const ctx = c.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
 
     ctx.fillStyle = '#efe6d8';
     ctx.fillRect(0, 0, L.width, L.height);
 
     shots.forEach((shot, i) => {
       const y = L.pad + i * (L.photoH + L.gap);
-      roundRectPath(ctx, L.pad, y, L.photoW, L.photoH, 10);
+      roundRectPath(ctx, L.pad, y, L.photoW, L.photoH, 10 * S);
       ctx.save();
       ctx.clip();
       ctx.filter = 'sepia(0.55) saturate(1.2) brightness(1.05) contrast(0.96)';
       ctx.drawImage(shot, L.pad, y, L.photoW, L.photoH);
       ctx.restore();
       ctx.strokeStyle = 'rgba(27,21,18,0.35)';
-      ctx.lineWidth = 1.5;
-      roundRectPath(ctx, L.pad, y, L.photoW, L.photoH, 10);
+      ctx.lineWidth = 1.5 * S;
+      roundRectPath(ctx, L.pad, y, L.photoW, L.photoH, 10 * S);
       ctx.stroke();
     });
 
     ctx.fillStyle = '#1b1512';
-    const maxTextW2 = L.width - 56;
+    const maxTextW2 = L.width - 56 * S;
     const capText2 = getCaptionText('Sunroom Booth');
-    const capSize2 = fitFontSize(ctx, capText2, maxTextW2, 24, 13, s => `600 ${s}px Fraunces, serif`);
+    const capSize2 = fitFontSize(ctx, capText2, maxTextW2, 24 * S, 13 * S, s => `600 ${s}px Fraunces, serif`);
     ctx.font = `600 ${capSize2}px Fraunces, serif`;
     ctx.textAlign = 'center';
-    ctx.fillText(capText2, L.width / 2, L.height - 44);
+    ctx.fillText(capText2, L.width / 2, L.height - 44 * S);
 
     ctx.fillStyle = '#7a5233';
     const dateText2 = getDateText();
-    const dateSize2 = fitFontSize(ctx, dateText2, maxTextW2, 12, 9, s => `${s}px "IBM Plex Mono", monospace`);
+    const dateSize2 = fitFontSize(ctx, dateText2, maxTextW2, 12 * S, 9 * S, s => `${s}px "IBM Plex Mono", monospace`);
     ctx.font = `${dateSize2}px "IBM Plex Mono", monospace`;
-    ctx.fillText(dateText2, L.width / 2, L.height - 22);
+    ctx.fillText(dateText2, L.width / 2, L.height - 22 * S);
     return c;
   }
 
   function buildNight(shots) {
     const L = baseLayout();
+    const S = L.scale;
     const c = document.createElement('canvas');
     c.width = L.width; c.height = L.height;
     const ctx = c.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
 
     const grad = ctx.createLinearGradient(0, 0, 0, L.height);
     grad.addColorStop(0, '#241a16');
@@ -887,27 +995,88 @@
       const y = L.pad + i * (L.photoH + L.gap);
       ctx.drawImage(shot, L.pad, y, L.photoW, L.photoH);
       ctx.strokeStyle = '#d98e3b';
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 2 * S;
       ctx.strokeRect(L.pad, y, L.photoW, L.photoH);
       ctx.strokeStyle = 'rgba(217,142,59,0.35)';
-      ctx.lineWidth = 6;
-      ctx.strokeRect(L.pad - 5, y - 5, L.photoW + 10, L.photoH + 10);
+      ctx.lineWidth = 6 * S;
+      ctx.strokeRect(L.pad - 5 * S, y - 5 * S, L.photoW + 10 * S, L.photoH + 10 * S);
     });
 
     const ticket = ticketNumber;
     ctx.fillStyle = '#efe6d8';
-    const maxTextW3 = L.width - 56;
+    const maxTextW3 = L.width - 56 * S;
     const capText3 = getCaptionText('Night Arcade');
-    const capSize3 = fitFontSize(ctx, capText3, maxTextW3, 22, 13, s => `600 ${s}px Fraunces, serif`);
+    const capSize3 = fitFontSize(ctx, capText3, maxTextW3, 22 * S, 13 * S, s => `600 ${s}px Fraunces, serif`);
     ctx.font = `600 ${capSize3}px Fraunces, serif`;
     ctx.textAlign = 'center';
-    ctx.fillText(capText3, L.width / 2, L.height - 44);
+    ctx.fillText(capText3, L.width / 2, L.height - 44 * S);
 
     ctx.fillStyle = '#d98e3b';
     const dateText3 = `strip no. ${ticket}  ·  ${getDateText()}`;
-    const dateSize3 = fitFontSize(ctx, dateText3, maxTextW3, 12, 8, s => `${s}px "IBM Plex Mono", monospace`);
+    const dateSize3 = fitFontSize(ctx, dateText3, maxTextW3, 12 * S, 8 * S, s => `${s}px "IBM Plex Mono", monospace`);
     ctx.font = `${dateSize3}px "IBM Plex Mono", monospace`;
-    ctx.fillText(dateText3, L.width / 2, L.height - 22);
+    ctx.fillText(dateText3, L.width / 2, L.height - 22 * S);
+    return c;
+  }
+
+  function buildBlush(shots) {
+    const L = baseLayout();
+    const S = L.scale;
+    const c = document.createElement('canvas');
+    c.width = L.width; c.height = L.height;
+    const ctx = c.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+
+    const grad = ctx.createLinearGradient(0, 0, 0, L.height);
+    grad.addColorStop(0, '#ffeef5');
+    grad.addColorStop(1, '#ffd6e8');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, L.width, L.height);
+
+    shots.forEach((shot, i) => {
+      const y = L.pad + i * (L.photoH + L.gap);
+      // a soft rose "shadow" card sitting behind the white polaroid frame
+      roundRectPath(ctx, L.pad + 3 * S, y + 5 * S, L.photoW, L.photoH, 12 * S);
+      ctx.fillStyle = 'rgba(214,51,108,0.18)';
+      ctx.fill();
+
+      roundRectPath(ctx, L.pad, y, L.photoW, L.photoH, 12 * S);
+      ctx.fillStyle = '#ffffff';
+      ctx.fill();
+      ctx.save();
+      roundRectPath(ctx, L.pad + 6 * S, y + 6 * S, L.photoW - 12 * S, L.photoH - 12 * S, 8 * S);
+      ctx.clip();
+      ctx.filter = 'saturate(1.12) brightness(1.04) contrast(1.02)';
+      ctx.drawImage(shot, L.pad + 6 * S, y + 6 * S, L.photoW - 12 * S, L.photoH - 12 * S);
+      ctx.restore();
+    });
+
+    // three little confetti dots, echoing the capture-progress dots
+    const dotY = L.height - 62 * S;
+    const dotColors = ['#d6336c', '#f8a1c4', '#ffb703'];
+    const dotSpacing = 12 * S;
+    const dotStartX = L.width / 2 - dotSpacing;
+    dotColors.forEach((color, i) => {
+      ctx.beginPath();
+      ctx.fillStyle = color;
+      ctx.arc(dotStartX + i * dotSpacing, dotY, 3.2 * S, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    ctx.fillStyle = '#d6336c';
+    const maxTextW4 = L.width - 56 * S;
+    const capText4 = getCaptionText('Blush Pop');
+    const capSize4 = fitFontSize(ctx, capText4, maxTextW4, 24 * S, 13 * S, s => `600 ${s}px Fraunces, serif`);
+    ctx.font = `600 ${capSize4}px Fraunces, serif`;
+    ctx.textAlign = 'center';
+    ctx.fillText(capText4, L.width / 2, L.height - 40 * S);
+
+    ctx.fillStyle = '#a94476';
+    const dateText4 = getDateText();
+    const dateSize4 = fitFontSize(ctx, dateText4, maxTextW4, 12 * S, 9 * S, s => `${s}px "IBM Plex Mono", monospace`);
+    ctx.font = `${dateSize4}px "IBM Plex Mono", monospace`;
+    ctx.fillText(dateText4, L.width / 2, L.height - 20 * S);
     return c;
   }
 
